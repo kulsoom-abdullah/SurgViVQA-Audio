@@ -15,7 +15,7 @@ build/
 # Data (too large for Git - will sync from R2/network volume)
 audio/
 dataset/
-data/
+/data/
 *.mp3
 *.wav
 *.jpg

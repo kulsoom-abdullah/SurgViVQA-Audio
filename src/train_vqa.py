@@ -1,30 +1,42 @@
 """
 Train Audio-Grafted Qwen2-VL for Surgical VQA (QLoRA)
+- Quantized base model (4-bit) + bf16 LoRA adapters
+- All 8 frames at 384px for both train and eval
+- SDPA attention (compatible with quantized weights)
+- W&B tracking enabled
 
-Launch command:
-python train_vqa.py \
-    --output_dir ./checkpoints/overfit_qlora_test \
-    --run_name "qlora-check-002-001" \
+Launch command for full training (50-sample overfit test):
+python src/train_vqa.py \
+    --output_dir ./checkpoints/surgical_vqa_50 \
+    --run_name "surgical-vqa-50-samples" \
     --train_data_path test_set/in_002-001.jsonl \
     --eval_data_path test_set/out_002-001.jsonl \
-    --frames_dir dataset/frames \
-    --audio_dir audio/in_002-001 \
-    --eval_audio_dir audio/out_002-001 \
+    --frames_dir data/frames \
+    --audio_dir data/audio/in_002-001 \
+    --eval_audio_dir data/audio/out_002-001 \
     --per_device_train_batch_size 1 \
     --gradient_accumulation_steps 4 \
+    --per_device_eval_batch_size 1 \
+    --eval_accumulation_steps 4 \
     --learning_rate 2e-4 \
     --num_train_epochs 20 \
-    --warmup_ratio 0.0 \
+    --warmup_ratio 0.05 \
     --do_eval \
     --eval_strategy steps \
     --eval_steps 10 \
     --save_strategy steps \
     --save_steps 50 \
-    --save_total_limit 1 \
+    --save_total_limit 2 \
     --load_best_model_at_end True \
     --metric_for_best_model eval_loss \
     --bf16 True \
+    --gradient_checkpointing True \
+    --logging_steps 5 \
     --report_to wandb
+
+Memory usage on RTX 4090 24GB:
+- Training: ~21GB (batch_size=1, 8 frames @ 384px)
+- Eval: ~19GB (batch_size=1, 8 frames @ 384px)
 """
 
 import os
@@ -229,26 +241,26 @@ def train():
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
-    # Load BF16 Model with SDPA (handles mixed precision better than FlashAttention)
-    print("⏳ Loading merged BF16 model with SDPA attention...")
+    # Load Quantized Model with SDPA (QLoRA: 4-bit base + bf16 LoRA)
+    print("⏳ Loading 4-bit quantized model with SDPA attention...")
+    from transformers import BitsAndBytesConfig
+
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype=torch.bfloat16,
+        bnb_4bit_use_double_quant=True
+    )
+
     model = Qwen2VLForConditionalGeneration.from_pretrained(
         model_args.model_name_or_path,
-        torch_dtype=torch.bfloat16,
-        device_map="auto",
-        attn_implementation="sdpa",  # More robust for mixed dtypes
+        quantization_config=bnb_config,
+        # device_map="auto", #have 2 GPUs now
+        attn_implementation="sdpa",  # Works with quantized weights
         trust_remote_code=True
     )
 
-    # Simple dtype casting for multimodal components
-    print("🔧 Ensuring multimodal components are bf16...")
-    if hasattr(model, 'visual'):
-        model.visual = model.visual.to(torch.bfloat16)
-    if hasattr(model, 'audio_encoder'):
-        model.audio_encoder = model.audio_encoder.to(torch.bfloat16)
-    if hasattr(model, 'audio_projector'):
-        model.audio_projector = model.audio_projector.to(torch.bfloat16)
-
-    print("✓ Model loaded in full BF16")
+    print("✓ Model loaded with 4-bit quantization (QLoRA ready)")
 
     # Hybrid Processor
     tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path, trust_remote_code=True, use_fast=False)
@@ -295,7 +307,7 @@ def train():
     eval_dataset = None
     if data_args.eval_data_path:
         print(f"📁 Loading Eval Data: {data_args.eval_data_path}")
-        print(f"   Using 6 frames (evenly sampled) to reduce eval memory")
+        print(f"   Using all 8 frames at 384px (same as training)")
         eval_audio_path = data_args.eval_audio_dir if data_args.eval_audio_dir else data_args.audio_dir
 
         eval_dataset = SurgicalVQADataset(
@@ -303,7 +315,7 @@ def train():
             data_args.frames_dir,
             eval_audio_path,
             processor, tokenizer, feature_extractor,
-            max_eval_frames=6,  # Eval uses 6 frames (memory efficient)
+            max_eval_frames=None,  # Eval uses all 8 frames (same as training)
             is_eval=True
         )
 
