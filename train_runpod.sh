@@ -60,7 +60,6 @@ $CMD src/train_vqa.py \
     --load_best_model_at_end True \
     --metric_for_best_model eval_loss \
     --bf16 True \
-    --gradient_checkpointing True \
     --logging_steps 5 \
     --report_to wandb
 

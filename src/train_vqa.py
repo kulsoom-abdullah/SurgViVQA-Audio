@@ -30,9 +30,10 @@ python src/train_vqa.py \
     --load_best_model_at_end True \
     --metric_for_best_model eval_loss \
     --bf16 True \
-    --gradient_checkpointing True \
     --logging_steps 5 \
     --report_to wandb
+
+Note: Gradient checkpointing is enabled manually in the code with non-reentrant mode for DDP+QLoRA compatibility.
 
 Memory usage on RTX 4090 24GB:
 - Training: ~21GB (batch_size=1, 8 frames @ 384px)
@@ -68,6 +69,14 @@ from torch.utils.data import Dataset
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Suppress "copying from non-meta parameter" warnings during checkpoint loading
+import warnings
+warnings.filterwarnings(
+    "ignore",
+    message=".*meta parameter.*",
+    category=UserWarning,
+)
 
 # Using your merged Stage 1 + Stage 2 checkpoint from HuggingFace
 MODEL_ID = "kulsoom-abdullah/Qwen2-Audio-7B-Transcription"
