@@ -293,6 +293,15 @@ def train():
     model = get_peft_model(model, lora_config)
     model.print_trainable_parameters()
 
+    # CRITICAL FIX: Enable input grads for QLoRA + DDP + gradient checkpointing
+    print("🔧 Configuring for multi-GPU training...")
+    model.enable_input_require_grads()
+    model.config.use_cache = False
+
+    # Use non-reentrant gradient checkpointing (required for DDP + QLoRA)
+    model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+    print("✓ DDP-compatible gradient checkpointing enabled")
+
     # Prepare Datasets
     print(f"📁 Loading Train Data: {data_args.train_data_path}")
     train_dataset = SurgicalVQADataset(
