@@ -47,27 +47,47 @@ def evaluate(args):
     print("SURGICAL VQA EVALUATION")
     print("="*80)
 
-    # Load model
-    print(f"\n⏳ Loading model from: {args.checkpoint_path}")
-    model = Qwen2VLForConditionalGeneration.from_pretrained(
-        args.checkpoint_path,
-        torch_dtype=torch.bfloat16,
+    # Load base model + LoRA adapters
+    print(f"\n⏳ Loading base model and adapters from: {args.checkpoint_path}")
+
+    # Load tokenizer/processor from base model (not from PEFT checkpoint)
+    BASE_MODEL = "kulsoom-abdullah/Qwen2-Audio-7B-Transcription"
+    print(f"Loading tokenizer from base: {BASE_MODEL}")
+    tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, trust_remote_code=True, use_fast=False)
+
+    # Load base model (4-bit quantized)
+    from transformers import BitsAndBytesConfig
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype=torch.bfloat16,
+        bnb_4bit_use_double_quant=True
+    )
+
+    base_model = Qwen2VLForConditionalGeneration.from_pretrained(
+        BASE_MODEL,
+        quantization_config=bnb_config,
         device_map="auto",
-        attn_implementation="sdpa",  # Memory efficient
+        attn_implementation="sdpa",
         trust_remote_code=True
     )
+
+    # Load LoRA adapters
+    from peft import PeftModel
+    print(f"Loading LoRA adapters from: {args.checkpoint_path}")
+    model = PeftModel.from_pretrained(base_model, args.checkpoint_path)
     model.eval()
 
-    tokenizer = AutoTokenizer.from_pretrained(args.checkpoint_path, trust_remote_code=True)
+    # Load processor from Qwen2-VL base
+    print("Loading processor from Qwen2-VL-7B-Instruct")
+    processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-7B-Instruct", trust_remote_code=True, use_fast=False)
+    processor.tokenizer = tokenizer
 
     # Fix PAD/EOS if needed
     if tokenizer.pad_token_id == tokenizer.eos_token_id or tokenizer.pad_token_id is None:
         print("🔧 Setting dedicated pad token for generation")
         tokenizer.add_special_tokens({'pad_token': '<|pad|>'})
         # Note: We don't resize embeddings here since checkpoint already has it
-
-    processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-7B-Instruct", trust_remote_code=True)
-    processor.tokenizer = tokenizer
     feature_extractor = WhisperFeatureExtractor.from_pretrained("openai/whisper-large-v3-turbo")
 
     # Load eval data
