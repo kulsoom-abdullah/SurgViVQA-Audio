@@ -101,6 +101,7 @@ class TrainingArguments(transformers.TrainingArguments):
     optim: str = field(default="adamw_bnb_8bit")  # 8-bit AdamW for memory efficiency
     max_seq_length: int = field(default=MAX_LENGTH)
     early_stopping_patience: int = field(default=0)  # 0 = disabled, >0 = enable early stopping
+    ddp_find_unused_parameters: bool = field(default=False)  # All parameters used, avoid overhead
 
 class SurgicalVQADataset(Dataset):
     def __init__(self, data_path, frames_dir, audio_dir, processor, tokenizer, feature_extractor,
