@@ -13,7 +13,21 @@ random.seed(42)
 
 # Load full 002-001 OUT data (natural language questions)
 print("Loading data...")
-with open('out_template.jsonl') as f:
+import os
+
+# Check which file exists
+if os.path.exists('out_template.jsonl'):
+    data_file = 'out_template.jsonl'
+    print("Using out_template.jsonl from root directory")
+elif os.path.exists('test_set/out_002-001.jsonl'):
+    # Use the small test set for now
+    data_file = 'test_set/out_002-001.jsonl'
+    print("Using test_set/out_002-001.jsonl (50 samples)")
+    print("Note: This is the small 50-sample set. For full training, upload out_template.jsonl")
+else:
+    raise FileNotFoundError("Cannot find out_template.jsonl or test_set/out_002-001.jsonl")
+
+with open(data_file) as f:
     all_data = [json.loads(line) for line in f]
 
 # Filter only 002-001
