@@ -12,6 +12,11 @@ python evaluate_checkpoint.py \
     --batch_size 1
 """
 
+import warnings
+# Suppress "copying from non-meta parameter" warnings during checkpoint loading
+warnings.filterwarnings("ignore", message=".*copying from a non-meta parameter.*", category=UserWarning)
+warnings.filterwarnings("ignore", message=".*meta parameter.*", category=UserWarning)
+
 import torch
 import json
 import argparse
