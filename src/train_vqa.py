@@ -59,7 +59,8 @@ from transformers import (
     Qwen2VLForConditionalGeneration,
     AutoTokenizer,
     AutoProcessor,
-    WhisperFeatureExtractor
+    WhisperFeatureExtractor,
+    EarlyStoppingCallback
 )
 from peft import (
     LoraConfig,
@@ -99,6 +100,7 @@ class TrainingArguments(transformers.TrainingArguments):
     cache_dir: Optional[str] = field(default=None)
     optim: str = field(default="adamw_bnb_8bit")  # 8-bit AdamW for memory efficiency
     max_seq_length: int = field(default=MAX_LENGTH)
+    early_stopping_patience: int = field(default=0)  # 0 = disabled, >0 = enable early stopping
 
 class SurgicalVQADataset(Dataset):
     def __init__(self, data_path, frames_dir, audio_dir, processor, tokenizer, feature_extractor,
@@ -337,12 +339,21 @@ def train():
             is_eval=True
         )
 
+    # Setup callbacks
+    callbacks = []
+    if training_args.early_stopping_patience > 0 and eval_dataset is not None:
+        print(f"⏹️  Early stopping enabled (patience={training_args.early_stopping_patience})")
+        callbacks.append(EarlyStoppingCallback(
+            early_stopping_patience=training_args.early_stopping_patience
+        ))
+
     trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         data_collator=DataCollatorForSurgicalVQA(tokenizer),
+        callbacks=callbacks if callbacks else None,
     )
 
     print("🚀 Starting Training...")
