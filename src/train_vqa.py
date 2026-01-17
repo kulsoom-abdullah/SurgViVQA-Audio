@@ -80,12 +80,12 @@ warnings.filterwarnings(
 )
 
 # Using your merged Stage 1 + Stage 2 checkpoint from HuggingFace
-MODEL_ID = "kulsoom-abdullah/Qwen2-Audio-7B-Transcription"
+AUDIO_ADAPTED_MODEL_ID = "kulsoom-abdullah/Qwen2-Audio-7B-Transcription"
 MAX_LENGTH = 1024
 
 @dataclass
 class ModelArguments:
-    model_name_or_path: Optional[str] = field(default=MODEL_ID)
+    model_name_or_path: Optional[str] = field(default=AUDIO_ADAPTED_MODEL_ID)
 
 @dataclass
 class DataArguments:

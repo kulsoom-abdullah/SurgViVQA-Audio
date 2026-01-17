@@ -15,7 +15,10 @@ from transformers import (
     WhisperFeatureExtractor
 )
 
-def load_model(model_path="kulsoom-abdullah/Qwen2-Audio-7B-Transcription"):
+# Using your merged Stage 1 + Stage 2 checkpoint from HuggingFace
+AUDIO_ADAPTED_MODEL_ID = "kulsoom-abdullah/Qwen2-Audio-7B-Transcription"
+
+def load_model(model_path=AUDIO_ADAPTED_MODEL_ID):
     """
     Load Qwen2-Audio model with all components from your HuggingFace repo.
     Now that preprocessor_config.json is uploaded, everything loads cleanly!

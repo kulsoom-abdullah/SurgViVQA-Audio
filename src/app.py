@@ -28,6 +28,7 @@ warnings.filterwarnings("ignore")
 # --- CONFIGURATION ---
 CHECKPOINT_PATH = "./checkpoints/surgical_vqa_multivideo"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
+AUDIO_ADAPTED_MODEL_ID = "kulsoom-abdullah/Qwen2-Audio-7B-Transcription"
 
 st.set_page_config(page_title="SurgViVQA Assistant", layout="wide", page_icon="🩺")
 
@@ -46,7 +47,7 @@ def load_model_system():
 
         # Load base model
         base_model = Qwen2VLForConditionalGeneration.from_pretrained(
-            "kulsoom-abdullah/Qwen2-Audio-7B-Transcription",
+            AUDIO_ADAPTED_MODEL_ID,
             quantization_config=bnb_config,
             device_map=DEVICE,
             attn_implementation="sdpa",
@@ -59,7 +60,7 @@ def load_model_system():
 
         # Processors
         tokenizer = AutoTokenizer.from_pretrained(
-            "kulsoom-abdullah/Qwen2-Audio-7B-Transcription",
+            AUDIO_ADAPTED_MODEL_ID,
             trust_remote_code=True,
             use_fast=False
         )
