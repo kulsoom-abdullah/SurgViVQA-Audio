@@ -15,13 +15,18 @@ build/
 # Data (too large for Git - will sync from R2/network volume)
 audio/
 dataset/
-/data/
+data/frames/
+data/audio/
 *.mp3
 *.wav
-*.jpg
-*.png
 *.mp4
 *.avi
+
+# Images - but allow documentation images in docs/
+*.jpg
+*.png
+!docs/*.jpg
+!docs/*.png
 
 # Checkpoints (upload to HuggingFace instead)
 checkpoints/

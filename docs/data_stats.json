@@ -1,0 +1,464 @@
+{
+  "data_distribution": {
+    "eval": {
+      "total_samples": 398,
+      "question_types": {
+        "fluid_occlusion_level": 22,
+        "flush_action": 22,
+        "lesion_screen_position": 15,
+        "nbi_status": 22,
+        "mucosa_visibility": 22,
+        "tool_catheter_check": 22,
+        "occlusion_check": 22,
+        "lesion_motion_direction": 15,
+        "blue_dye_presence": 22,
+        "scope_backward_motion": 22,
+        "scope_forward_motion": 22,
+        "lighting_mode": 22,
+        "lesion_size_range": 15,
+        "lesion_histology_extended": 15,
+        "scope_motion_type": 22,
+        "scope_outside": 22,
+        "lesion_site": 15,
+        "endoscope_visibility": 22,
+        "tool_identification": 15,
+        "scope_motion": 22
+      },
+      "reasoning_domains": {
+        "Operation Notes": 110,
+        "Other": 214,
+        "Movement": 59,
+        "Instruments": 15
+      },
+      "answer_analysis": {
+        "fluid_occlusion_level": {
+          "total": 22,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 22,
+          "is_yes_no": false
+        },
+        "flush_action": {
+          "total": 22,
+          "yes": 11,
+          "no": 11,
+          "yes_no": 22,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "lesion_screen_position": {
+          "total": 15,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 15,
+          "is_yes_no": false
+        },
+        "nbi_status": {
+          "total": 22,
+          "yes": 14,
+          "no": 8,
+          "yes_no": 22,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "mucosa_visibility": {
+          "total": 22,
+          "yes": 9,
+          "no": 13,
+          "yes_no": 22,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "tool_catheter_check": {
+          "total": 22,
+          "yes": 8,
+          "no": 14,
+          "yes_no": 22,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "occlusion_check": {
+          "total": 22,
+          "yes": 12,
+          "no": 10,
+          "yes_no": 22,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "lesion_motion_direction": {
+          "total": 15,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 15,
+          "is_yes_no": false
+        },
+        "blue_dye_presence": {
+          "total": 22,
+          "yes": 0,
+          "no": 22,
+          "yes_no": 22,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "scope_backward_motion": {
+          "total": 22,
+          "yes": 13,
+          "no": 9,
+          "yes_no": 22,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "scope_forward_motion": {
+          "total": 22,
+          "yes": 12,
+          "no": 10,
+          "yes_no": 22,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "lighting_mode": {
+          "total": 22,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 22,
+          "is_yes_no": false
+        },
+        "lesion_size_range": {
+          "total": 15,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 15,
+          "is_yes_no": false
+        },
+        "lesion_histology_extended": {
+          "total": 15,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 15,
+          "is_yes_no": false
+        },
+        "scope_motion_type": {
+          "total": 22,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 22,
+          "is_yes_no": false
+        },
+        "scope_outside": {
+          "total": 22,
+          "yes": 13,
+          "no": 9,
+          "yes_no": 22,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "lesion_site": {
+          "total": 15,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 15,
+          "is_yes_no": false
+        },
+        "endoscope_visibility": {
+          "total": 22,
+          "yes": 6,
+          "no": 16,
+          "yes_no": 22,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "tool_identification": {
+          "total": 15,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 15,
+          "is_yes_no": false
+        },
+        "scope_motion": {
+          "total": 22,
+          "yes": 10,
+          "no": 12,
+          "yes_no": 22,
+          "open_ended": 0,
+          "is_yes_no": true
+        }
+      },
+      "overall_answers": {
+        "yes": 108,
+        "no": 134,
+        "yes_no_total": 242,
+        "open_ended": 156
+      }
+    },
+    "test": {
+      "total_samples": 1000,
+      "question_types": {
+        "scope_outside": 50,
+        "lesion_histology_extended": 50,
+        "lesion_site": 50,
+        "lesion_screen_position": 50,
+        "scope_motion": 50,
+        "tool_catheter_check": 50,
+        "occlusion_check": 50,
+        "fluid_occlusion_level": 50,
+        "tool_identification": 50,
+        "nbi_status": 50,
+        "lesion_motion_direction": 50,
+        "blue_dye_presence": 50,
+        "flush_action": 50,
+        "lesion_size_range": 50,
+        "lighting_mode": 50,
+        "scope_motion_type": 50,
+        "mucosa_visibility": 50,
+        "endoscope_visibility": 50,
+        "scope_forward_motion": 50,
+        "scope_backward_motion": 50
+      },
+      "reasoning_domains": {
+        "Other": 550,
+        "Movement": 150,
+        "Operation Notes": 250,
+        "Instruments": 50
+      },
+      "answer_analysis": {
+        "scope_outside": {
+          "total": 50,
+          "yes": 25,
+          "no": 25,
+          "yes_no": 50,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "lesion_histology_extended": {
+          "total": 50,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 50,
+          "is_yes_no": false
+        },
+        "lesion_site": {
+          "total": 50,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 50,
+          "is_yes_no": false
+        },
+        "lesion_screen_position": {
+          "total": 50,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 50,
+          "is_yes_no": false
+        },
+        "scope_motion": {
+          "total": 50,
+          "yes": 25,
+          "no": 25,
+          "yes_no": 50,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "tool_catheter_check": {
+          "total": 50,
+          "yes": 0,
+          "no": 50,
+          "yes_no": 50,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "occlusion_check": {
+          "total": 50,
+          "yes": 25,
+          "no": 25,
+          "yes_no": 50,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "fluid_occlusion_level": {
+          "total": 50,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 50,
+          "is_yes_no": false
+        },
+        "tool_identification": {
+          "total": 50,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 50,
+          "is_yes_no": false
+        },
+        "nbi_status": {
+          "total": 50,
+          "yes": 25,
+          "no": 25,
+          "yes_no": 50,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "lesion_motion_direction": {
+          "total": 50,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 50,
+          "is_yes_no": false
+        },
+        "blue_dye_presence": {
+          "total": 50,
+          "yes": 0,
+          "no": 50,
+          "yes_no": 50,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "flush_action": {
+          "total": 50,
+          "yes": 25,
+          "no": 25,
+          "yes_no": 50,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "lesion_size_range": {
+          "total": 50,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 50,
+          "is_yes_no": false
+        },
+        "lighting_mode": {
+          "total": 50,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 50,
+          "is_yes_no": false
+        },
+        "scope_motion_type": {
+          "total": 50,
+          "yes": 0,
+          "no": 0,
+          "yes_no": 0,
+          "open_ended": 50,
+          "is_yes_no": false
+        },
+        "mucosa_visibility": {
+          "total": 50,
+          "yes": 25,
+          "no": 25,
+          "yes_no": 50,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "endoscope_visibility": {
+          "total": 50,
+          "yes": 0,
+          "no": 50,
+          "yes_no": 50,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "scope_forward_motion": {
+          "total": 50,
+          "yes": 25,
+          "no": 25,
+          "yes_no": 50,
+          "open_ended": 0,
+          "is_yes_no": true
+        },
+        "scope_backward_motion": {
+          "total": 50,
+          "yes": 25,
+          "no": 25,
+          "yes_no": 50,
+          "open_ended": 0,
+          "is_yes_no": true
+        }
+      },
+      "overall_answers": {
+        "yes": 200,
+        "no": 350,
+        "yes_no_total": 550,
+        "open_ended": 450
+      }
+    }
+  },
+  "reasoning_domains": {
+    "Instruments": [
+      "tool_presence",
+      "tool_identification",
+      "tool_count"
+    ],
+    "Sizing": [
+      "lesion_size",
+      "lesion_extent",
+      "lesion_count"
+    ],
+    "Diagnosis": [
+      "lesion_type",
+      "lesion_classification"
+    ],
+    "Positions": [
+      "anatomical_location",
+      "organ_identification",
+      "lesion_location"
+    ],
+    "Operation Notes": [
+      "occlusion",
+      "blue_dye_presence",
+      "flush_action",
+      "lighting_mode",
+      "nbi_status",
+      "blood_presence",
+      "fluid_occlusion_level",
+      "phase_identification"
+    ],
+    "Movement": [
+      "scope_motion",
+      "scope_forward_motion",
+      "lesion_motion_direction",
+      "scope_rotation"
+    ]
+  },
+  "domain_mapping": {
+    "tool_presence": "Instruments",
+    "tool_identification": "Instruments",
+    "tool_count": "Instruments",
+    "lesion_size": "Sizing",
+    "lesion_extent": "Sizing",
+    "lesion_count": "Sizing",
+    "lesion_type": "Diagnosis",
+    "lesion_classification": "Diagnosis",
+    "anatomical_location": "Positions",
+    "organ_identification": "Positions",
+    "lesion_location": "Positions",
+    "occlusion": "Operation Notes",
+    "blue_dye_presence": "Operation Notes",
+    "flush_action": "Operation Notes",
+    "lighting_mode": "Operation Notes",
+    "nbi_status": "Operation Notes",
+    "blood_presence": "Operation Notes",
+    "fluid_occlusion_level": "Operation Notes",
+    "phase_identification": "Operation Notes",
+    "scope_motion": "Movement",
+    "scope_forward_motion": "Movement",
+    "lesion_motion_direction": "Movement",
+    "scope_rotation": "Movement"
+  }
+}

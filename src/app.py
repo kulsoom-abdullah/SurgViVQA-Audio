@@ -123,7 +123,7 @@ def get_frames(sample, frames_dir="data/frames"):
 
 # --- INFERENCE FUNCTION ---
 def run_inference(model, processor, tokenizer, feature_extractor, frames, audio_array, question_text):
-    """Run model inference with audio grafting"""
+    """Run model inference with audio adapter"""
 
     # 1. Process audio
     audio_inputs = feature_extractor(audio_array, sampling_rate=16000, return_tensors="pt")
@@ -133,7 +133,7 @@ def run_inference(model, processor, tokenizer, feature_extractor, frames, audio_
     content = [{"type": "image"} for _ in frames]
     content.append({
         "type": "text",
-        "text": f"User Question: {question_text}\nAnswer the question concisely based on the visual and audio evidence."
+        "text": f"User Question: {question_text}\nAnswer the question concisely based on the visual and audio."
     })
     msgs = [{"role": "user", "content": content}]
 
@@ -183,7 +183,7 @@ def run_inference(model, processor, tokenizer, feature_extractor, frames, audio_
 
 # --- MAIN APP ---
 st.title("🩺 SurgViVQA-Audio: Interactive Demo")
-st.markdown(f"**Audio-Grafted Qwen2-VL** | Device: `{DEVICE}`")
+st.markdown(f"**Qwen2-VL-Audio-Adapter** | Device: `{DEVICE}`")
 
 # Load model (happens once, cached)
 model, processor, tokenizer, feature_extractor = load_model_system()
@@ -255,16 +255,23 @@ with st.sidebar:
 
     st.divider()
 
-    # 5. Model stats
-    st.markdown("### 📈 Model Performance")
-    st.markdown("""
-    - **Eval Acc:** 67.84%
-    - **Test Acc:** 63.40%
-    - **Baseline:** 46%
-    - **Gain:** +17.4 points
-    - **Training:** 2,300 samples
-    - **Method:** QLoRA (4-bit)
+# 5. Model Strengths (The Behavioral Profile)
+    st.markdown("### 🧠 Model Capability Profile")
+    st.info("""
+    **✅ 100% Reliable (Static):**
+    * Blue Dye Presence
+    * Lighting Mode (NBI/White)
+    * Endoscope Visibility
+    
+    **⚠️ 84% Reliable (Safety):**
+    * Occlusion Check (Blocked View?)
+    
+    **📉 20-55% Reliable (Dynamic):**
+    * Motion (Is scope advancing?)
+    * Precise Localization (Which quadrant?)
     """)
+    
+    st.caption("Based on held-out test video 002-004")
 
 # --- MAIN CONTENT ---
 sample = st.session_state.sample
@@ -287,16 +294,16 @@ with tab_anim:
     col_play, col_desc = st.columns([1, 2])
 
     with col_play:
-        if st.button("▶️ Play Sequence (4 FPS)", use_container_width=True):
+        if st.button("▶️ Play Sequence (2 FPS)", use_container_width=True):
             placeholder = st.empty()
             for loop in range(2):  # Play twice
                 for i, frame in enumerate(frames):
                     placeholder.image(frame, caption=f"Frame {i+1}/{len(frames)}", width=400)
-                    time.sleep(0.25)  # 4 FPS for visibility
+                    time.sleep(0.5)  # 2 FPS for better visibility
 
     with col_desc:
         st.markdown("""
-        **Why animation matters:**
+        **Video Frames Animation:**
 
         Motion questions like *"Is the scope advancing?"* require understanding temporal changes.
 
