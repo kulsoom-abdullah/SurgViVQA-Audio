@@ -224,11 +224,18 @@ pip install -r requirements.txt
 
 ### 2. 🎬 Streamlit Demo
 
-Running locally on 1x RTX 4090. Latency: ~1.2s per query.
+Running on 1x RTX 4090. Latency: ~1.2s per query.
 
 [![Watch the Demo](docs/demo_screenshot.png)](https://www.loom.com/share/e6259484ed0f4ad2aac584860c0d32f0)
 
-*Click the image above to watch the full 2-minute walkthrough.*
+> *Click above for the full technical walkthrough (4:40). Use the chapters below to jump to specific tests:*
+
+**⏱️ Video Chapters:**
+* [**0:00** - Architecture: Why Audio-Grafting? (2.5x Speedup)](https://www.loom.com/share/e6259484ed0f4ad2aac584860c0d32f0?t=0)
+* [**0:32** - Safety Test 1: Occlusion Check (False Positive Analysis)](https://www.loom.com/share/e6259484ed0f4ad2aac584860c0d32f0?t=32)
+* [**1:46** - Safety Test 2: Tool/Catheter Detection (Success)](https://www.loom.com/share/e6259484ed0f4ad2aac584860c0d32f0?t=106)
+* [**2:29** - The Challenge: Scope Motion & Temporal Reasoning](https://www.loom.com/share/e6259484ed0f4ad2aac584860c0d32f0?t=149)
+* [**3:54** - Precision Test: Lighting Mode & NBI (100% Reliability)](https://www.loom.com/share/e6259484ed0f4ad2aac584860c0d32f0?t=234)
 
 To launch the interactive surgical VQA assistant:
 
