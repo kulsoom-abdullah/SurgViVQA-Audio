@@ -45,7 +45,7 @@ EOF
 for vid in 002-002 002-003 002-004; do
     echo ""
     echo "🎙️ Generating audio for video ${vid}..."
-    python3 generate_audio_subset.py \
+    python3 scripts/generate_audio_subset.py \
         --input out_${vid}_temp.jsonl \
         --output data/audio/out_${vid}
     echo "✓ Audio generated: data/audio/out_${vid}/"

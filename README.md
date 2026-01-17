@@ -306,10 +306,12 @@ SurgViVQA-Audio/
 ├── scripts/
 │   ├── train_multivideo_overnight.sh    # Full training script
 │   ├── generate_audio_multivideo.sh     # TTS generation for 3 videos
+│   ├── generate_audio_subset.py         # TTS audio generation for dataset samples
+│   ├── generate_all_audio.py            # Batch audio generation utility
 │   └── create_multivideo_split.py       # Stratified data splitting
-├── analyze_data_distribution.py    # Generate data stats (run anytime)
-├── generate_audio_subset.py        # TTS audio generation for dataset samples
-├── generate_all_audio.py           # Batch audio generation utility
+├── *.jsonl                          # Data splits (train/eval/test + templates)
+├── analyze_data_distribution.py     # Generate data stats (run anytime)
+├── baseline_results.txt             # Experimental results documentation
 └── README.md
 ```
 
