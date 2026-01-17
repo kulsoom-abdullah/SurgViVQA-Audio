@@ -76,7 +76,7 @@ I used a portion of the [**SurgViVQA**](https://github.com/madratak/SurgViVQA/) 
 |--------|----------|---------------------|
 | **Overall Accuracy** | 67.84% | **63.40%** (634/1000) |
 | **Zero-Shot Baselines** | - | 44-46% (text or audio) |
-| **Improvement** | - | **+17-19 points** |
+| **Improvement** | - | **+17.4 points** |
 
 **Baseline Comparison:**
 We compared our end-to-end grafted model against a traditional two-stage pipeline (Whisper ASR → Text VQA).
@@ -382,9 +382,9 @@ A technical paper describing this project is currently in preparation. In the me
 
 This project is licensed under the **Apache 2.0 License**.
 
-You are free to use, modify, and distribute this software, provided that proper credit is given (see Citation above). 
+You are free to use, modify, and distribute this software, provided that proper credit is given (see Citation above).
 
-- See [LICENSE](https://www.apache.org/licenses/LICENSE-2.0.txt) for the full text.
+- See [LICENSE](LICENSE) for the full text.
 ---
 
 ## 📧 Contact
@@ -393,5 +393,5 @@ You are free to use, modify, and distribute this software, provided that proper 
 
 ---
 
-*Built with: PyTorch, Transformers (custom fork), PEFT, Streamlit, Librosa, Edge-TTS*
+*Built with: PyTorch, [Transformers (custom fork)](https://github.com/kulsoom-abdullah/Qwen2-VL-Audio-Adapter/tree/main/transformers_fork), PEFT, Streamlit, Librosa, Edge-TTS*
 
