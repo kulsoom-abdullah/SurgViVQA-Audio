@@ -17,6 +17,9 @@ from peft import PeftModel
 sys.path.append(os.getcwd())
 from src.train_vqa import SurgicalVQADataset, DataCollatorForSurgicalVQA
 
+# Using your merged Stage 1 + Stage 2 checkpoint from HuggingFace
+AUDIO_ADAPTED_MODEL_ID = "kulsoom-abdullah/Qwen2-Audio-7B-Transcription"
+
 def calculate_metrics(results):
     """Break down accuracy by 'question_type'."""
     by_type = {}
@@ -74,7 +77,7 @@ def main():
     )
     
     model = Qwen2VLForConditionalGeneration.from_pretrained(
-        "kulsoom-abdullah/Qwen2-Audio-7B-Transcription",
+        AUDIO_ADAPTED_MODEL_ID,
         quantization_config=bnb_config,
         device_map=args.device,  # <--- FORCE THE DEVICE HERE
         attn_implementation="sdpa",

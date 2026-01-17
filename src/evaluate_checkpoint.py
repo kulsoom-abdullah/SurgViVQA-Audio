@@ -26,6 +26,9 @@ from transformers import Qwen2VLForConditionalGeneration, AutoTokenizer, AutoPro
 from PIL import Image
 import librosa
 
+# Using your merged Stage 1 + Stage 2 checkpoint from HuggingFace
+AUDIO_ADAPTED_MODEL_ID = "kulsoom-abdullah/Qwen2-Audio-7B-Transcription"
+
 def load_frames(frame_names, frames_dir, max_size=384):
     """Load and resize frames"""
     images = []
@@ -56,9 +59,8 @@ def evaluate(args):
     print(f"\n⏳ Loading base model and adapters from: {args.checkpoint_path}")
 
     # Load tokenizer/processor from base model (not from PEFT checkpoint)
-    BASE_MODEL = "kulsoom-abdullah/Qwen2-Audio-7B-Transcription"
-    print(f"Loading tokenizer from base: {BASE_MODEL}")
-    tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, trust_remote_code=True, use_fast=False)
+    print(f"Loading tokenizer from base: {AUDIO_ADAPTED_MODEL_ID}")
+    tokenizer = AutoTokenizer.from_pretrained(AUDIO_ADAPTED_MODEL_ID, trust_remote_code=True, use_fast=False)
 
     # Load base model (4-bit quantized)
     from transformers import BitsAndBytesConfig
@@ -70,7 +72,7 @@ def evaluate(args):
     )
 
     base_model = Qwen2VLForConditionalGeneration.from_pretrained(
-        BASE_MODEL,
+        AUDIO_ADAPTED_MODEL_ID,
         quantization_config=bnb_config,
         device_map="auto",
         attn_implementation="sdpa",
