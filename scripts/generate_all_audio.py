@@ -17,8 +17,8 @@ import time
 # Configuration
 VOICE = "en-US-AriaNeural"  # Professional female voice
 FILES = {
-    "in_template.jsonl": "audio/in_template",
-    "out_template.jsonl": "audio/out_template"
+    "data/in_template.jsonl": "audio/in_template",
+    "data/out_template.jsonl": "audio/out_template"
 }
 
 async def generate_audio(text, output_file):

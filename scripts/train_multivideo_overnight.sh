@@ -34,7 +34,7 @@ fi
 
 # Create multi-video stratified split
 echo "📊 Creating multi-video stratified split..."
-python3 create_multivideo_split.py
+python3 scripts/create_multivideo_split.py
 
 # Check audio directories exist
 echo ""
@@ -62,8 +62,8 @@ fi
 $CMD src/train_vqa.py \
     --output_dir ./checkpoints/surgical_vqa_multivideo \
     --run_name "surgical-vqa-multivideo-overnight-$(date +%Y%m%d-%H%M%S)" \
-    --train_data_path train_multivideo.jsonl \
-    --eval_data_path eval_multivideo.jsonl \
+    --train_data_path data/train_multivideo.jsonl \
+    --eval_data_path data/eval_multivideo.jsonl \
     --frames_dir data/frames \
     --audio_dir data/audio \
     --eval_audio_dir data/audio \
@@ -101,6 +101,6 @@ echo "   python src/evaluate_checkpoint.py --checkpoint_path ./checkpoints/surgi
 echo ""
 echo "2. Final evaluation on held-out video 002-004:"
 echo "   python src/evaluate_checkpoint.py --checkpoint_path ./checkpoints/surgical_vqa_multivideo \\"
-echo "       --eval_data_path test_multivideo.jsonl \\"
+echo "       --eval_data_path data/test_multivideo.jsonl \\"
 echo "       --frames_dir data/frames --audio_dir data/audio \\"
 echo "       --output_file results/final_test_002004.jsonl"

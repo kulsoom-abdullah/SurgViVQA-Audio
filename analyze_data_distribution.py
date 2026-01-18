@@ -236,17 +236,17 @@ def main():
     print("=" * 60)
 
     # Check if data files exist
-    required_files = ['train_multivideo.jsonl', 'eval_multivideo.jsonl', 'test_multivideo.jsonl']
+    required_files = ['data/train_multivideo.jsonl', 'data/eval_multivideo.jsonl', 'data/test_multivideo.jsonl']
     for f in required_files:
         if not Path(f).exists():
             print(f"❌ Error: {f} not found!")
-            print("   Make sure you're running this from the project root")
+            print("   Make sure you're running this from the project root and data/ contains the dataset files")
             return
 
     # Load all three splits
-    train_stats = analyze_dataset('train_multivideo.jsonl')
-    eval_stats = analyze_dataset('eval_multivideo.jsonl')
-    test_stats = analyze_dataset('test_multivideo.jsonl')
+    train_stats = analyze_dataset('data/train_multivideo.jsonl')
+    eval_stats = analyze_dataset('data/eval_multivideo.jsonl')
+    test_stats = analyze_dataset('data/test_multivideo.jsonl')
 
     print(f"\n✓ Train: {train_stats['total_samples']} samples")
     print(f"✓ Eval: {eval_stats['total_samples']} samples")

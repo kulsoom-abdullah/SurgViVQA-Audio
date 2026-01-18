@@ -17,7 +17,7 @@
 
 ### 2. Bias Mitigation (Stratified Scaling)
 * **Challenge:** Medical data is often imbalanced. While this set, SurgViVQA, was not severely skewed globally (61% Yes/No), critical categories like `tool_identification` represent only **3.7%** of the data. Random splitting risked leaving these out of the validation set.
-* **Solution:** Implemented **Question-Type Stratification** ([`create_multivideo_split.py`](create_multivideo_split.py)) to ensure every category (e.g., Tools, Motion, Lesion) was represented in the 15% Eval split.
+* **Solution:** Implemented **Question-Type Stratification** ([`scripts/create_multivideo_split.py`](scripts/create_multivideo_split.py)) to ensure every category (e.g., Tools, Motion, Lesion) was represented in the 15% Eval split.
 * **Result:** Achieved **84% accuracy** on safety-critical classes like `occlusion_check`.
 
 ### 3. Generalization (Held-Out Video)
@@ -276,7 +276,7 @@ Evaluate a trained checkpoint on the held-out test set:
 ```bash
 python3 src/evaluate_checkpoint.py \
     --checkpoint_path ./checkpoints/surgical_vqa_multivideo \
-    --eval_data_path test_multivideo.jsonl \
+    --eval_data_path data/test_multivideo.jsonl \
     --frames_dir data/frames \
     --audio_dir data/audio \
     --output_file results/final_test_002004.jsonl
@@ -303,13 +303,13 @@ SurgViVQA-Audio/
 ├── data/
 │   ├── frames/                     # Extracted video frames (by video ID)
 │   └── audio/                      # Generated TTS audio files
+│   └── *.jsonl                     # Data splits (train/eval/test + templates)
 ├── scripts/
 │   ├── train_multivideo_overnight.sh    # Full training script
 │   ├── generate_audio_multivideo.sh     # TTS generation for 3 videos
 │   ├── generate_audio_subset.py         # TTS audio generation for dataset samples
 │   ├── generate_all_audio.py            # Batch audio generation utility
 │   └── create_multivideo_split.py       # Stratified data splitting
-├── *.jsonl                          # Data splits (train/eval/test + templates)
 ├── analyze_data_distribution.py     # Generate data stats (run anytime)
 ├── baseline_results.txt             # Experimental results documentation
 └── README.md

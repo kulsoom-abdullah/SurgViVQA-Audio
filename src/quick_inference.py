@@ -60,7 +60,7 @@ def calculate_metrics(results):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--checkpoint", type=str, required=True, help="Path to checkpoint (e.g., checkpoint-200)")
-    parser.add_argument("--eval_file", type=str, default="eval_002001_stratified.jsonl")
+    parser.add_argument("--eval_file", type=str, default="data/eval_002001_stratified.jsonl")
     parser.add_argument("--frames_dir", type=str, default="data/frames")
     parser.add_argument("--audio_dir", type=str, default="data/audio/out_002-001")
     parser.add_argument("--device", type=str, default="cuda:0", help="Force specific GPU (cuda:0 or cuda:1)")

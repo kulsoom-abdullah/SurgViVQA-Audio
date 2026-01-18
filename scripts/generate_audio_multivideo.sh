@@ -28,7 +28,7 @@ echo "📊 Extracting questions by video..."
 python3 << 'EOF'
 import json
 
-with open('out_template.jsonl') as f:
+with open('data/out_template.jsonl') as f:
     all_data = [json.loads(line) for line in f]
 
 # Split by video

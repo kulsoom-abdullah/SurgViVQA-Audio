@@ -14,7 +14,7 @@ random.seed(42)
 
 # Load full OUT data (natural language questions)
 print("Loading data...")
-with open('out_template.jsonl') as f:
+with open('data/out_template.jsonl') as f:
     all_data = [json.loads(line) for line in f]
 
 # Split by video
@@ -77,19 +77,19 @@ print(f"  Test: {len(test_qtypes)} types")
 
 # Save splits
 print("\nSaving splits...")
-with open('train_multivideo.jsonl', 'w') as f:
+with open('data/train_multivideo.jsonl', 'w') as f:
     for sample in train_data:
         f.write(json.dumps(sample) + '\n')
 
-with open('eval_multivideo.jsonl', 'w') as f:
+with open('data/eval_multivideo.jsonl', 'w') as f:
     for sample in eval_data:
         f.write(json.dumps(sample) + '\n')
 
-with open('test_multivideo.jsonl', 'w') as f:
+with open('data/test_multivideo.jsonl', 'w') as f:
     for sample in test_data:
         f.write(json.dumps(sample) + '\n')
 
-print(f"✅ Saved train_multivideo.jsonl ({len(train_data)} samples)")
-print(f"✅ Saved eval_multivideo.jsonl ({len(eval_data)} samples)")
-print(f"✅ Saved test_multivideo.jsonl ({len(test_data)} samples)")
+print(f"✅ Saved data/train_multivideo.jsonl ({len(train_data)} samples)")
+print(f"✅ Saved data/eval_multivideo.jsonl ({len(eval_data)} samples)")
+print(f"✅ Saved data/test_multivideo.jsonl ({len(test_data)} samples)")
 print("\nReady for overnight training!")

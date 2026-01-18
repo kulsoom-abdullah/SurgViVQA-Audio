@@ -84,9 +84,9 @@ def load_samples():
     """Loads test/eval samples - prioritizes OUT (natural language) data"""
     # Priority: Test Multivideo -> Eval Multivideo -> Out test set
     paths = [
-        "test_multivideo.jsonl",
-        "eval_multivideo.jsonl",
-        "eval_002001_stratified.jsonl"
+        "data/test_multivideo.jsonl",
+        "data/eval_multivideo.jsonl",
+        "data/eval_002001_stratified.jsonl"
     ]
     data = []
     loaded_from = None
