@@ -57,21 +57,23 @@ Following the SurgViVQA paper structure (6 domains):
 
 **Total Yes/No questions:** 1408 (61.2% of training set)
 
-### Open-Ended Questions
+### Limited-Choice Questions (2-5 Options)
 
-| Question Type | Domain | Total | Example Answers |
-|---------------|--------|-------|----------------|
-| fluid_occlusion_level | Operation Notes | 128 | Varies (e.g., polyp, cecum, grasper) |
-| lighting_mode | Operation Notes | 128 | Varies (e.g., polyp, cecum, grasper) |
-| scope_motion_type | Other | 128 | Varies (e.g., polyp, cecum, grasper) |
-| lesion_histology_extended | Other | 85 | Varies (e.g., polyp, cecum, grasper) |
-| lesion_motion_direction | Movement | 85 | Varies (e.g., polyp, cecum, grasper) |
-| lesion_screen_position | Other | 85 | Varies (e.g., polyp, cecum, grasper) |
-| lesion_site | Other | 85 | Varies (e.g., polyp, cecum, grasper) |
-| lesion_size_range | Other | 85 | Varies (e.g., polyp, cecum, grasper) |
-| tool_identification | Instruments | 85 | Varies (e.g., polyp, cecum, grasper) |
+| Question Type | Domain | Total | Distinct Answers | Answer Distribution (Training Set) |
+|---------------|--------|-------|------------------|-----------------------------------|
+| **lesion_motion_direction** | Movement | 85 | **5 options** | stable (22%), left (21%), down (20%), right (20%), up (16%) |
+| **lesion_screen_position** | Other | 85 | **4 options** | lower-right (27%), lower-left (25%), upper-right (25%), upper-left (24%) |
+| **lesion_site** | Other | 85 | **4 options** | sigma (35%), rectum (34%), transverse (18%), descending (13%) |
+| **lesion_size_range** | Other | 85 | **3 options** | <5mm (64%), 5-10mm (24%), >10mm (12%) |
+| **tool_identification** | Instruments | 85 | **3 options** | forceps (65%), snare (24%), catheter (11%) |
+| **fluid_occlusion_level** | Operation Notes | 128 | **3 options** | absent (47%), complete (29%), partial (24%) |
+| **lighting_mode** | Operation Notes | 128 | **2 options** | WL (white light) (52%), NBI (48%) |
+| **scope_motion_type** | Other | 128 | **2 options** | advancing (52%), withdrawing (48%) |
+| **lesion_histology_extended** | Other | 85 | **2 options** | hyperplastic (53%), adenomatous (47%) |
 
-**Total open-ended questions:** 894 (38.8% of training set)
+**Total limited-choice questions:** 894 (38.8% of training set)
+
+**Note:** These questions are NOT open-ended. Each has a small, fixed set of possible answers (2-5 options), making them multi-way classification tasks rather than generative QA.
 
 ---
 
@@ -81,7 +83,7 @@ Following the SurgViVQA paper structure (6 domains):
 |-------------|-------|------------|
 | Yes | 592 | 25.7% |
 | No | 816 | 35.4% |
-| Open-ended | 894 | 38.8% |
+| Limited-choice (2-5 options) | 894 | 38.8% |
 | **Total** | **2302** | **100.0%** |
 
 ---
