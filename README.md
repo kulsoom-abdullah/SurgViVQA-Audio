@@ -83,7 +83,7 @@ We compared our end-to-end grafted model against a traditional two-stage pipelin
 * **Accuracy:** Fine-tuning the audio-grafted model improved accuracy from ~46% (zero-shot) to **63.4%**, matching the performance of text-based approaches while using raw audio.
 
 * **Speed:** By bypassing the intermediate text transcription step, our model achieves a **2.5× speed advantage** over the ASR pipeline (1.07 vs 0.43 samples/sec), making it far more suitable for real-time surgical assistance.
-* 📄 **Baseline scripts:** [`baseline1_text_image.py`](baselines/baseline1_text_image.py) | [`baseline2_audio_image.py`](baselines/baseline2_audio_image.py)
+* 📄 **Baseline scripts:** [`baseline1_text_image.py`](baselines/baseline1_text_image.py) | [`baseline2_audio_image.py`](baselines/baseline2_audio_image.py) | [Results Log](docs/baseline_results.txt)
 
 
 ---
@@ -309,9 +309,11 @@ SurgViVQA-Audio/
 │   ├── generate_audio_multivideo.sh     # TTS generation for 3 videos
 │   ├── generate_audio_subset.py         # TTS audio generation for dataset samples
 │   ├── generate_all_audio.py            # Batch audio generation utility
-│   └── create_multivideo_split.py       # Stratified data splitting
-├── analyze_data_distribution.py     # Generate data stats (run anytime)
-├── baseline_results.txt             # Experimental results documentation
+│   ├── create_multivideo_split.py       # Stratified data splitting
+│   └── analyze_data_distribution.py     # Generate data stats (run anytime)
+├── docs/
+│   ├── baseline_results.txt             # Experimental results documentation
+│   └── ...
 └── README.md
 ```
 

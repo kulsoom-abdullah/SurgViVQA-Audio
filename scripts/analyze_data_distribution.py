@@ -235,18 +235,24 @@ def main():
     print("📊 Analyzing SurgViVQA Data Distribution...")
     print("=" * 60)
 
+    # Determine paths relative to this script
+    script_dir = Path(__file__).resolve().parent
+    # Assuming script is in scripts/ and data is in ../data
+    data_dir = script_dir.parent / 'data'
+    docs_dir = script_dir.parent / 'docs'
+
     # Check if data files exist
-    required_files = ['data/train_multivideo.jsonl', 'data/eval_multivideo.jsonl', 'data/test_multivideo.jsonl']
+    required_files = ['train_multivideo.jsonl', 'eval_multivideo.jsonl', 'test_multivideo.jsonl']
     for f in required_files:
-        if not Path(f).exists():
-            print(f"❌ Error: {f} not found!")
-            print("   Make sure you're running this from the project root and data/ contains the dataset files")
+        if not (data_dir / f).exists():
+            print(f"❌ Error: {(data_dir / f)} not found!")
+            print(f"   Make sure the data files exist in {data_dir}")
             return
 
     # Load all three splits
-    train_stats = analyze_dataset('data/train_multivideo.jsonl')
-    eval_stats = analyze_dataset('data/eval_multivideo.jsonl')
-    test_stats = analyze_dataset('data/test_multivideo.jsonl')
+    train_stats = analyze_dataset(data_dir / 'train_multivideo.jsonl')
+    eval_stats = analyze_dataset(data_dir / 'eval_multivideo.jsonl')
+    test_stats = analyze_dataset(data_dir / 'test_multivideo.jsonl')
 
     print(f"\n✓ Train: {train_stats['total_samples']} samples")
     print(f"✓ Eval: {eval_stats['total_samples']} samples")
@@ -256,24 +262,23 @@ def main():
     print(f"✓ Total: {total} samples")
 
     # Ensure docs directory exists
-    import os
-    os.makedirs('docs', exist_ok=True)
+    docs_dir.mkdir(parents=True, exist_ok=True)
 
     # Generate markdown report for README
     print("\n📝 Generating markdown report...")
     md_report = generate_markdown_report(train_stats, eval_stats, test_stats)
 
-    with open('docs/data_distribution.md', 'w') as f:
+    with open(docs_dir / 'data_distribution.md', 'w') as f:
         f.write(md_report)
-    print("✓ Saved: docs/data_distribution.md")
+    print(f"✓ Saved: {docs_dir / 'data_distribution.md'}")
 
     # Generate JSON for app
     print("\n💾 Generating JSON for app...")
     app_data = generate_json_for_app(eval_stats, test_stats)
 
-    with open('docs/data_stats.json', 'w') as f:
+    with open(docs_dir / 'data_stats.json', 'w') as f:
         json.dump(app_data, f, indent=2)
-    print("✓ Saved: docs/data_stats.json")
+    print(f"✓ Saved: {docs_dir / 'data_stats.json'}")
 
     # Print summary
     print("\n" + "="*60)
