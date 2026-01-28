@@ -94,14 +94,30 @@ $CMD src/train_qwen3_text_image.py \
 echo ""
 echo "✅ Training complete!"
 echo ""
-echo "Next: Evaluate on test set (1,000 held-out samples from video 002-004)"
+
+# Auto-evaluate on test set
+echo "🧪 Auto-evaluating on test set (1,000 held-out samples)..."
 echo ""
-echo "python src/evaluate_qwen3.py \\"
-echo "    --checkpoint_path ./checkpoints/qwen3_text_image \\"
-echo "    --test_file data/test_multivideo.jsonl \\"
-echo "    --frames_dir data/frames \\"
-echo "    --output results/qwen3_finetuned_test.jsonl"
+
+python src/evaluate_qwen3.py \
+    --checkpoint_path ./checkpoints/qwen3_text_image \
+    --test_file data/test_multivideo.jsonl \
+    --frames_dir data/frames \
+    --output results/qwen3_finetuned_test.jsonl
+
 echo ""
 echo "Compare to:"
 echo "  - Qwen 3.0 zero-shot: 54.10% (results/vision_comparison/qwen3.0_full.jsonl)"
 echo "  - Qwen 2.0 + audio: 63.40% (from your original run)"
+echo ""
+
+# Optional: Auto-terminate RunPod instance when done
+if [ -n "$RUNPOD_API_KEY" ] && [ -n "$RUNPOD_POD_ID" ]; then
+    echo "🛑 Auto-terminating RunPod instance..."
+    curl -s -X POST "https://api.runpod.io/v2/${RUNPOD_POD_ID}/terminate" \
+         -H "Authorization: Bearer ${RUNPOD_API_KEY}" \
+         -H "Content-Type: application/json"
+    echo "✅ Pod termination requested"
+else
+    echo "💡 Tip: Set RUNPOD_API_KEY and RUNPOD_POD_ID to auto-terminate when done"
+fi
