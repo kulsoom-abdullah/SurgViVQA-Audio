@@ -1,0 +1,28 @@
+# Core ML frameworks
+torch>=2.1.0
+transformers>=4.47.0
+accelerate>=0.25.0
+peft>=0.7.0
+bitsandbytes>=0.41.0
+
+# Audio processing
+librosa>=0.10.0
+soundfile>=0.12.0
+
+# Image processing
+pillow>=10.0.0
+
+# Training utilities
+wandb>=0.15.0
+tqdm>=4.65.0
+
+# Utilities
+sentencepiece>=0.1.99
+protobuf>=3.20.0
+
+# Flash Attention (optional, for future use)
+flash-attn>=2.5.0; platform_system == "Linux"
+
+# Data handling
+datasets>=2.14.0
+huggingface-hub>=0.20.0

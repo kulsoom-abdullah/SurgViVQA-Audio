@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>data_distribution.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="data-distribution">Data Distribution</h1>
+<h2 id="dataset-overview">Dataset Overview</h2>
+<p><strong>Source:</strong> <a href="https://github.com/madratak/SurgViVQA/">SurgViVQA Dataset</a> - A temporally-grounded surgical VQA dataset</p>
+<p>I used a subset of the SurgViVQA dataset (3,700 samples from 4 video IDs). Audio was generated from text questions using edge-tts to simulate spoken queries.</p>
+<h3 id="terminology-clarification">Terminology Clarification</h3>
+<ul>
+<li><strong>Video ID:</strong> Identifier for source colonoscopy procedure (e.g., 002-001, 002-002)</li>
+<li><strong>Sample:</strong> Individual VQA instance (question + 8 frames + answer)</li>
+<li><strong>Frames:</strong> Temporal sequence of 8 frames extracted from video at specific timestamps</li>
+</ul>
+<hr>
+<h2 id="dataset-splits">Dataset Splits</h2>
+<table>
+<thead>
+<tr>
+<th>Split</th>
+<th>Samples</th>
+<th>Video IDs</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Train</strong></td>
+<td>2,302</td>
+<td>002-001, 002-002, 002-003</td>
+<td>Model training</td>
+</tr>
+<tr>
+<td><strong>Eval</strong></td>
+<td>398</td>
+<td>002-001, 002-002, 002-003</td>
+<td>Validation during training</td>
+</tr>
+<tr>
+<td><strong>Test</strong></td>
+<td>1,000</td>
+<td>002-004 (held-out)</td>
+<td>Final generalization test</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>3,700</strong></td>
+<td>4 colonoscopy videos</td>
+<td>20 question types</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="reasoning-domains">Reasoning Domains</h2>
+<p>Following the SurgViVQA paper structure (6 domains):</p>
+<table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Count</th>
+<th>Percentage</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Instruments</strong></td>
+<td>85</td>
+<td>3.7%</td>
+<td>Tool presence, identification, counting</td>
+</tr>
+<tr>
+<td><strong>Operation Notes</strong></td>
+<td>640</td>
+<td>27.8%</td>
+<td>Visibility, lighting, dye, occlusion</td>
+</tr>
+<tr>
+<td><strong>Movement</strong></td>
+<td>341</td>
+<td>14.8%</td>
+<td>Scope/lesion motion, direction</td>
+</tr>
+<tr>
+<td><strong>Other</strong></td>
+<td>1236</td>
+<td>53.7%</td>
+<td>Miscellaneous</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="question-types-by-answer-format">Question Types by Answer Format</h2>
+<h3 id="yesno-questions">Yes/No Questions</h3>
+<table>
+<thead>
+<tr>
+<th>Question Type</th>
+<th>Domain</th>
+<th>Total</th>
+<th>Yes</th>
+<th>No</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>blue_dye_presence</td>
+<td>Operation Notes</td>
+<td>128</td>
+<td>0</td>
+<td>128</td>
+</tr>
+<tr>
+<td>endoscope_visibility</td>
+<td>Other</td>
+<td>128</td>
+<td>44</td>
+<td>84</td>
+</tr>
+<tr>
+<td>flush_action</td>
+<td>Operation Notes</td>
+<td>128</td>
+<td>64</td>
+<td>64</td>
+</tr>
+<tr>
+<td>mucosa_visibility</td>
+<td>Other</td>
+<td>128</td>
+<td>66</td>
+<td>62</td>
+</tr>
+<tr>
+<td>nbi_status</td>
+<td>Operation Notes</td>
+<td>128</td>
+<td>61</td>
+<td>67</td>
+</tr>
+<tr>
+<td>occlusion_check</td>
+<td>Other</td>
+<td>128</td>
+<td>63</td>
+<td>65</td>
+</tr>
+<tr>
+<td>scope_backward_motion</td>
+<td>Other</td>
+<td>128</td>
+<td>62</td>
+<td>66</td>
+</tr>
+<tr>
+<td>scope_forward_motion</td>
+<td>Movement</td>
+<td>128</td>
+<td>63</td>
+<td>65</td>
+</tr>
+<tr>
+<td>scope_motion</td>
+<td>Movement</td>
+<td>128</td>
+<td>65</td>
+<td>63</td>
+</tr>
+<tr>
+<td>scope_outside</td>
+<td>Other</td>
+<td>128</td>
+<td>62</td>
+<td>66</td>
+</tr>
+<tr>
+<td>tool_catheter_check</td>
+<td>Other</td>
+<td>128</td>
+<td>42</td>
+<td>86</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total Yes/No questions:</strong> 1408 (61.2% of training set)</p>
+<h3 id="open-ended-questions">Open-Ended Questions</h3>
+<table>
+<thead>
+<tr>
+<th>Question Type</th>
+<th>Domain</th>
+<th>Total</th>
+<th>Example Answers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fluid_occlusion_level</td>
+<td>Operation Notes</td>
+<td>128</td>
+<td>Varies (e.g., polyp, cecum, grasper)</td>
+</tr>
+<tr>
+<td>lighting_mode</td>
+<td>Operation Notes</td>
+<td>128</td>
+<td>Varies (e.g., polyp, cecum, grasper)</td>
+</tr>
+<tr>
+<td>scope_motion_type</td>
+<td>Other</td>
+<td>128</td>
+<td>Varies (e.g., polyp, cecum, grasper)</td>
+</tr>
+<tr>
+<td>lesion_histology_extended</td>
+<td>Other</td>
+<td>85</td>
+<td>Varies (e.g., polyp, cecum, grasper)</td>
+</tr>
+<tr>
+<td>lesion_motion_direction</td>
+<td>Movement</td>
+<td>85</td>
+<td>Varies (e.g., polyp, cecum, grasper)</td>
+</tr>
+<tr>
+<td>lesion_screen_position</td>
+<td>Other</td>
+<td>85</td>
+<td>Varies (e.g., polyp, cecum, grasper)</td>
+</tr>
+<tr>
+<td>lesion_site</td>
+<td>Other</td>
+<td>85</td>
+<td>Varies (e.g., polyp, cecum, grasper)</td>
+</tr>
+<tr>
+<td>lesion_size_range</td>
+<td>Other</td>
+<td>85</td>
+<td>Varies (e.g., polyp, cecum, grasper)</td>
+</tr>
+<tr>
+<td>tool_identification</td>
+<td>Instruments</td>
+<td>85</td>
+<td>Varies (e.g., polyp, cecum, grasper)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total open-ended questions:</strong> 894 (38.8% of training set)</p>
+<hr>
+<h2 id="overall-answer-distribution">Overall Answer Distribution</h2>
+<table>
+<thead>
+<tr>
+<th>Answer Type</th>
+<th>Count</th>
+<th>Percentage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Yes</td>
+<td>592</td>
+<td>25.7%</td>
+</tr>
+<tr>
+<td>No</td>
+<td>816</td>
+<td>35.4%</td>
+</tr>
+<tr>
+<td>Open-ended</td>
+<td>894</td>
+<td>38.8%</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>2302</strong></td>
+<td><strong>100.0%</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="detailed-question-type-breakdown">Detailed Question Type Breakdown</h2>
+<p>All 20 question types across train/eval/test splits:</p>
+<table>
+<thead>
+<tr>
+<th>Question Type</th>
+<th>Domain</th>
+<th>Train</th>
+<th>Eval</th>
+<th>Test</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>blue_dye_presence</td>
+<td>Operation Notes</td>
+<td>128</td>
+<td>22</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>endoscope_visibility</td>
+<td>Other</td>
+<td>128</td>
+<td>22</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>fluid_occlusion_level</td>
+<td>Operation Notes</td>
+<td>128</td>
+<td>22</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>flush_action</td>
+<td>Operation Notes</td>
+<td>128</td>
+<td>22</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>lesion_histology_extended</td>
+<td>Other</td>
+<td>85</td>
+<td>15</td>
+<td>50</td>
+<td>150</td>
+</tr>
+<tr>
+<td>lesion_motion_direction</td>
+<td>Movement</td>
+<td>85</td>
+<td>15</td>
+<td>50</td>
+<td>150</td>
+</tr>
+<tr>
+<td>lesion_screen_position</td>
+<td>Other</td>
+<td>85</td>
+<td>15</td>
+<td>50</td>
+<td>150</td>
+</tr>
+<tr>
+<td>lesion_site</td>
+<td>Other</td>
+<td>85</td>
+<td>15</td>
+<td>50</td>
+<td>150</td>
+</tr>
+<tr>
+<td>lesion_size_range</td>
+<td>Other</td>
+<td>85</td>
+<td>15</td>
+<td>50</td>
+<td>150</td>
+</tr>
+<tr>
+<td>lighting_mode</td>
+<td>Operation Notes</td>
+<td>128</td>
+<td>22</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>mucosa_visibility</td>
+<td>Other</td>
+<td>128</td>
+<td>22</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>nbi_status</td>
+<td>Operation Notes</td>
+<td>128</td>
+<td>22</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>occlusion_check</td>
+<td>Other</td>
+<td>128</td>
+<td>22</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>scope_backward_motion</td>
+<td>Other</td>
+<td>128</td>
+<td>22</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>scope_forward_motion</td>
+<td>Movement</td>
+<td>128</td>
+<td>22</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>scope_motion</td>
+<td>Movement</td>
+<td>128</td>
+<td>22</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>scope_motion_type</td>
+<td>Other</td>
+<td>128</td>
+<td>22</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>scope_outside</td>
+<td>Other</td>
+<td>128</td>
+<td>22</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>tool_catheter_check</td>
+<td>Other</td>
+<td>128</td>
+<td>22</td>
+<td>50</td>
+<td>200</td>
+</tr>
+<tr>
+<td>tool_identification</td>
+<td>Instruments</td>
+<td>85</td>
+<td>15</td>
+<td>50</td>
+<td>150</td>
+</tr>
+</tbody>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>README.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="%F0%9F%A9%BA-surgvivqa-audio-audio-grafted-qwen2-vl-for-surgical-video-qa">🩺 SurgViVQA-Audio: Audio-Grafted Qwen2-VL for Surgical Video QA</h1>
+<blockquote>
+<p><strong>Goal:</strong> Engineering a multimodal agent to &quot;hear&quot; live OR audio directly (no ASR) and &quot;see&quot; surgery on consumer hardware (2× RTX 4090).</p>
+</blockquote>
+<p><strong>Quick Links:</strong> <a href="docs/data_distribution.md">📊 Data Distribution</a> | <a href="#-streamlit-demo">🎬 Streamlit Demo</a> | <a href="#-results">📈 Results</a></p>
+<hr>
+<h2 id="%F0%9F%9B%A0%EF%B8%8F-the-engineering-journey">🛠️ The Engineering Journey</h2>
+<p><em>From Proof-of-Concept to Generalization</em></p>
+<h3 id="1-feasibility-multimodal-grafting-test">1. Feasibility (Multimodal Grafting Test)</h3>
+<ul>
+<li><strong>Challenge:</strong> My <a href="https://github.com/kulsoom-abdullah/Qwen2-VL-Audio-Adapter">previous work</a> adapted audio as an input option to Qwen 2. This project tests that model with audio, text and now a third modality (Vision).</li>
+<li><strong>Method:</strong> Trained on a small set (10 samples) until Loss → 0.</li>
+<li><strong>Result:</strong> Confirmed the end-to-end gradient flow (Audio + Vision → Text) was functional before scaling the training.</li>
+</ul>
+<h3 id="2-bias-mitigation-stratified-scaling">2. Bias Mitigation (Stratified Scaling)</h3>
+<ul>
+<li><strong>Challenge:</strong> Medical data is often imbalanced. While this set, SurgViVQA, was not severely skewed globally (61% Yes/No), critical categories like <code>tool_identification</code> represent only <strong>3.7%</strong> of the data. Random splitting risked leaving these out of the validation set.</li>
+<li><strong>Solution:</strong> Implemented <strong>Question-Type Stratification</strong> (<a href="create_multivideo_split.py"><code>create_multivideo_split.py</code></a>) to ensure every category (e.g., Tools, Motion, Lesion) was represented in the 15% Eval split.</li>
+<li><strong>Result:</strong> Achieved <strong>84% accuracy</strong> on safety-critical classes like <code>occlusion_check</code>.</li>
+</ul>
+<h3 id="3-generalization-held-out-video">3. Generalization (Held-Out Video)</h3>
+<ul>
+<li><strong>Challenge:</strong> Prevent the model from memorizing specific patient anatomy.</li>
+<li><strong>Method:</strong> Evaluated on a completely unseen video (<code>002-004</code>) to test true clinical utility.</li>
+<li><strong>Result:</strong> <strong>63.4% Accuracy</strong> on held-out test set (+17.4 points over <a href="baselines/baseline2_audio_image.py">zero-shot baseline</a>).</li>
+</ul>
+<h3 id="4-deployment-streamlit-demo">4. Deployment (Streamlit Demo)</h3>
+<ul>
+<li><strong>Output:</strong> Built an interactive app (<a href="src/app.py"><code>src/app.py</code></a>) with &quot;Flipbook&quot; animation to visualize temporal motion for clinicians.</li>
+<li><strong>Features:</strong> Question type filtering, 8-frame grid view, animated playback (2 FPS), audio recording with live inference.</li>
+</ul>
+<hr>
+<h2 id="%F0%9F%93%8A-data-distribution">📊 Data Distribution</h2>
+<p>I used a portion of the <a href="https://github.com/madratak/SurgViVQA/"><strong>SurgViVQA</strong></a> dataset [1], generating audio from the text questions using <a href="https://github.com/rany2/edge-tts">edge-tts</a> to simulate a spoken-query audio.</p>
+<h3 id="dataset-splits">Dataset Splits</h3>
+<table>
+<thead>
+<tr>
+<th>Split</th>
+<th>Samples</th>
+<th>Video IDs (Procedures)</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Train</strong></td>
+<td>2,302</td>
+<td>002-001, 002-002, 002-003</td>
+<td>Model Training</td>
+</tr>
+<tr>
+<td><strong>Eval</strong></td>
+<td>398</td>
+<td>002-001, 002-002, 002-003</td>
+<td>In-Training Validation</td>
+</tr>
+<tr>
+<td><strong>Test</strong></td>
+<td>1,000</td>
+<td>002-004 (held-out)</td>
+<td>Generalization Testing</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>3,700</strong></td>
+<td>4 colonoscopy procedures</td>
+<td>20 question types</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Terminology:</strong> Each <strong>sample</strong> = 1 question + 8 consecutive frames + 1 answer. <strong>Video IDs</strong> refer to different colonoscopy procedures.</p>
+<h3 id="high-level-statistics">High-Level Statistics</h3>
+<ul>
+<li><strong>Question Types:</strong> 20 distinct categories across 4 reasoning domains</li>
+<li><strong>Answer Format Distribution:</strong>
+<ul>
+<li><strong>Yes/No questions:</strong> 13 types (65% of question types)
+<ul>
+<li>Examples: occlusion_check, scope_motion, tool_catheter_check</li>
+</ul>
+</li>
+<li><strong>Limited-Choice questions:</strong> 7 types (35% of question types)
+<ul>
+<li>2-5 options per question</li>
+<li>Examples: lesion_motion_direction (5 directions), lesion_site (4 locations), scope_motion_type (2 types)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Answer Distribution (training set):</strong>
+<ul>
+<li>Yes: 25.7% | No: 35.4% | Limited-choice: 38.8%</li>
+</ul>
+</li>
+<li><strong>Held-Out Test Set Characteristics:</strong>
+<ul>
+<li>Mixed balance: Motion and occlusion questions are balanced (50/50), while tool/dye presence questions in this specific video slice are single-class (100% 'No'), reflecting the specific procedure's nature.</li>
+<li>Limited-choice questions evenly distributed (e.g., lesion_motion_direction: 20% per direction)</li>
+<li>Some categories have zero variety (lesion_size_range: 100% &lt;5mm, tool_identification: 100% forceps)</li>
+</ul>
+</li>
+</ul>
+<p>📄 <strong>See detailed breakdown:</strong> <a href="docs/data_distribution.md">docs/data_distribution.md</a></p>
+<hr>
+<h2 id="%F0%9F%93%88-results">📈 Results</h2>
+<h3 id="performance-summary">Performance Summary</h3>
+<p><strong>Best Checkpoint:</strong> <code>checkpoint-1000</code> (epoch 3.48, selected by early stopping)</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Eval Set</th>
+<th>Test Set (Held-Out)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Overall Accuracy</strong></td>
+<td>67.84%</td>
+<td><strong>63.40%</strong> (634/1000)</td>
+</tr>
+<tr>
+<td><strong>Zero-Shot Baselines</strong></td>
+<td>-</td>
+<td>44-46% (text or audio)</td>
+</tr>
+<tr>
+<td><strong>Improvement</strong></td>
+<td>-</td>
+<td><strong>+17-19 points</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Baseline Comparison:</strong>
+We compared our end-to-end grafted model against a traditional two-stage pipeline (Whisper ASR → Text VQA).</p>
+<ul>
+<li>
+<p><strong>Accuracy:</strong> Fine-tuning the audio-grafted model improved accuracy from ~46% (zero-shot) to <strong>63.4%</strong>, matching the performance of text-based approaches while using raw audio.</p>
+</li>
+<li>
+<p><strong>Speed:</strong> By bypassing the intermediate text transcription step, our model achieves a <strong>2.5× speed advantage</strong> over the ASR pipeline (1.07 vs 0.43 samples/sec), making it far more suitable for real-time surgical assistance.</p>
+</li>
+<li>
+<p>📄 <strong>Baseline scripts:</strong> <a href="baselines/baseline1_text_image.py"><code>baseline1_text_image.py</code></a> | <a href="baselines/baseline2_audio_image.py"><code>baseline2_audio_image.py</code></a></p>
+</li>
+</ul>
+<hr>
+<h3 id="performance-by-question-type-held-out-test-set---procedure-002-004">Performance by Question Type (Held-Out Test Set - Procedure 002-004)</h3>
+<p><strong>Perfect Scores (100%):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Question Type</th>
+<th>Accuracy</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>blue_dye_presence</td>
+<td>100.0% (50/50)</td>
+<td>Binary question, clear visual signal</td>
+</tr>
+<tr>
+<td>endoscope_visibility</td>
+<td>100.0% (50/50)</td>
+<td>Unambiguous visibility assessment</td>
+</tr>
+<tr>
+<td>lesion_size_range</td>
+<td>100.0% (50/50)</td>
+<td>All test samples &lt;5mm (no variety)</td>
+</tr>
+<tr>
+<td>lighting_mode</td>
+<td>100.0% (50/50)</td>
+<td>All test samples NBI mode (no variety)</td>
+</tr>
+<tr>
+<td>tool_catheter_check</td>
+<td>100.0% (50/50)</td>
+<td>Binary tool presence</td>
+</tr>
+<tr>
+<td>scope_outside</td>
+<td>98.0% (49/50)</td>
+<td>Clear visual boundary detection</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Strong Performance (&gt;75%):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Question Type</th>
+<th>Accuracy</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>occlusion_check</td>
+<td>84.0% (42/50)</td>
+<td>Safety-critical, well-represented in training</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Moderate Performance (50-75%):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Question Type</th>
+<th>Accuracy</th>
+<th>Challenge</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tool_identification</td>
+<td>66.0% (33/50)</td>
+<td>All test samples: forceps only (limited variety)</td>
+</tr>
+<tr>
+<td>nbi_status</td>
+<td>56.0% (28/50)</td>
+<td>Binary lighting mode detection</td>
+</tr>
+<tr>
+<td>scope_forward_motion</td>
+<td>54.0% (27/50)</td>
+<td>Temporal reasoning across 8 frames</td>
+</tr>
+<tr>
+<td>mucosa_visibility</td>
+<td>52.0% (26/50)</td>
+<td>Subjective visibility assessment</td>
+</tr>
+<tr>
+<td>scope_backward_motion</td>
+<td>50.0% (25/50)</td>
+<td>Motion direction (temporal)</td>
+</tr>
+<tr>
+<td>scope_motion</td>
+<td>50.0% (25/50)</td>
+<td>Binary motion detection</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Challenging Questions (&lt;50%):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Question Type</th>
+<th>Accuracy</th>
+<th>Root Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>flush_action</td>
+<td>48.0% (24/50)</td>
+<td>Subtle fluid motion detection</td>
+</tr>
+<tr>
+<td>scope_motion_type</td>
+<td>46.0% (23/50)</td>
+<td>2-way classification (advancing/withdrawing)</td>
+</tr>
+<tr>
+<td>lesion_histology_extended</td>
+<td>46.0% (23/50)</td>
+<td>All test: hyperplastic (no variety)</td>
+</tr>
+<tr>
+<td>fluid_occlusion_level</td>
+<td>44.0% (22/50)</td>
+<td>2-way classification (absent/complete)</td>
+</tr>
+<tr>
+<td>lesion_site</td>
+<td>34.0% (17/50)</td>
+<td>2-way in test (sigma/rectum), limited training</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Hardest Questions (&lt;25%):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Question Type</th>
+<th>Accuracy</th>
+<th>Analysis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>lesion_motion_direction</strong></td>
+<td><strong>20.0% (10/50)</strong></td>
+<td>5-way classification, temporal modeling limitation</td>
+</tr>
+<tr>
+<td><strong>lesion_screen_position</strong></td>
+<td><strong>20.0% (10/50)</strong></td>
+<td>4-way spatial reasoning (quadrant detection)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="key-insights">Key Insights</h3>
+<p>✅ <strong>What the model does well:</strong></p>
+<ul>
+<li>Binary Yes/No questions with clear visual signals (98-100%)</li>
+<li>Safety-critical assessments like occlusion detection (84%)</li>
+<li>Questions with no test set variety achieve perfect scores (artifacts of balanced test set)</li>
+</ul>
+<p>⚠️ <strong>Where the model struggles:</strong></p>
+<ul>
+<li><strong>Multi-way classification</strong> (5-way motion: 20%, 4-way position: 20%)</li>
+<li><strong>Temporal reasoning</strong> across 8 frames (motion questions: 20-54%)</li>
+<li><strong>Fine-grained spatial reasoning</strong> (lesion position quadrants: 20%)</li>
+</ul>
+<p><strong>Root causes:</strong></p>
+<ol>
+<li><strong>Frame independence:</strong> Model processes 8 frames independently, lacks video-native temporal modeling</li>
+<li><strong>Resolution constraint:</strong> 384px may be too low for precise spatial localization</li>
+<li><strong>Limited test variety:</strong> Some perfect scores (100%) are due to single-class test sets (all &lt;5mm, all NBI, all forceps)</li>
+</ol>
+<p>📊 <strong>Full evaluation:</strong> Run evaluation script to generate detailed per-sample results</p>
+<hr>
+<h2 id="%F0%9F%8F%97%EF%B8%8F-architecture">🏗️ Architecture</h2>
+<p>The architecture bypasses the standard ASR (Speech-to-Text) pipeline to reduce latency and error propagation, allowing the model to process raw audio embeddings directly alongside visual tokens.</p>
+<pre><code class="language-mermaid"><div class="mermaid">graph LR
+    A[Audio Waveform] -->|Whisper Large v3| B(Audio Encoder)
+    B -->|Projector 1280->3584| C(Audio Tokens)
+    D[Surgical Frames] -->|Vision Encoder| E(Visual Tokens)
+    C & E --> F[Qwen2-VL Decoder]
+    F --> G[Answer]
+</div></code></pre>
+<h3 id="audio-grafting-strategy">Audio Grafting Strategy</h3>
+<ul>
+<li><strong>Base Model:</strong> Qwen2-VL-7B-Instruct</li>
+<li><strong>Audio Encoder:</strong> Whisper Large v3 Turbo (Frozen)</li>
+<li><strong>Projector:</strong> Linear Layer (1280 → 3584) trained to map audio features to the LLM's embedding space</li>
+<li><strong>Innovation:</strong> Direct injection of 1,500 audio tokens into the multimodal sequence, allowing the model to attend to &quot;sound&quot; and &quot;sight&quot; jointly</li>
+</ul>
+<h3 id="qlora-training-config">QLoRA Training Config</h3>
+<ul>
+<li><strong>Hardware:</strong> 2x NVIDIA RTX 4090 (24GB VRAM each)</li>
+<li><strong>Precision:</strong> 4-bit Base Model + BF16 LoRA Adapters</li>
+<li><strong>LoRA Config:</strong> Rank 64, Alpha 16, targeting all attention/MLP projections</li>
+<li><strong>Target Modules:</strong> All linear projections (<code>q_proj</code>, <code>k_proj</code>, <code>v_proj</code>, <code>o_proj</code>, MLP layers)</li>
+<li><strong>Label Masking:</strong> Strictly mask all vision/audio tokens (<code>-100</code>), calculating loss <strong>only</strong> on the assistant's text response</li>
+<li><strong>Early Stopping:</strong> Patience=3, monitoring eval_loss (training stopped at epoch 4.53, best was 3.48)</li>
+<li><strong>Training Time:</strong> ~6 hours for 2,300 samples on 2x RTX 4090</li>
+</ul>
+<h3 id="%F0%9F%93%88-training-dynamics-weights--biases">📈 Training Dynamics (Weights &amp; Biases)</h3>
+<p>I tracked training stability using Weights &amp; Biases to ensure proper convergence without overfitting.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center"><strong>Training Loss</strong></th>
+<th style="text-align:center"><strong>Validation Loss (Eval)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img src="docs/train_loss.png" alt="Train Loss"></td>
+<td style="text-align:center"><img src="docs/eval_loss.png" alt="Eval Loss"></td>
+</tr>
+<tr>
+<td style="text-align:center"><em>Rapid convergence in first 200 steps</em></td>
+<td style="text-align:center"><em>Optimal generalization at Step 1000 (Loss ~0.054)</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Analysis:</strong></p>
+<ul>
+<li><strong>Convergence:</strong> Training loss dropped sharply, confirming the audio features were successfully mapped to the LLM embedding space.</li>
+<li><strong>Early Stopping:</strong> Validation loss bottomed out at <strong>Step 1000</strong> (Epoch 3.48) and began to rise shortly after (Step 1300), triggering our early stopping mechanism to prevent overfitting.</li>
+<li><strong>Total Training Time:</strong> 350 minutes (~5.8 hours) on 2x RTX 4090.</li>
+</ul>
+<h3 id="memory-optimization-decisions">Memory Optimization Decisions</h3>
+<ul>
+<li><strong>Image Resize:</strong> Downsampled to 384x384. While this impacts small tool detection, it was necessary to fit batch size 1 on consumer VRAM</li>
+<li><strong>Attention:</strong> Used <code>sdpa</code> (Scaled Dot Product Attention) for quantization compatibility</li>
+<li><strong>Gradient Checkpointing:</strong> Non-reentrant mode for DDP + QLoRA compatibility</li>
+</ul>
+<hr>
+<h2 id="%F0%9F%9A%80-quick-start">🚀 Quick Start</h2>
+<h3 id="1-setup-environment">1. Setup Environment</h3>
+<pre class="hljs"><code><div><span class="hljs-comment"># Clone repository</span>
+git <span class="hljs-built_in">clone</span> https://github.com/kulsoom-abdullah/SurgViVQA-Audio
+<span class="hljs-built_in">cd</span> SurgViVQA-Audio
+
+<span class="hljs-comment"># Create virtual environment</span>
+python3 -m venv venv
+<span class="hljs-built_in">source</span> venv/bin/activate
+
+<span class="hljs-comment"># Install dependencies</span>
+pip install -r requirements.txt
+</div></code></pre>
+<h3 id="2-%F0%9F%8E%AC-streamlit-demo">2. 🎬 Streamlit Demo</h3>
+<p>Running locally on 1x RTX 4090. Latency: ~1.2s per query.</p>
+<p><a href="https://www.loom.com/share/e6259484ed0f4ad2aac584860c0d32f0"><img src="docs/demo_screenshot.png" alt="Watch the Demo"></a></p>
+<p><em>Click the image above to watch the full 2-minute walkthrough.</em></p>
+<p>To launch the interactive surgical VQA assistant:</p>
+<pre class="hljs"><code><div>streamlit run src/app.py --server.port 8501 --server.address 0.0.0.0
+</div></code></pre>
+<p><strong>Features:</strong></p>
+<ul>
+<li>🎤 Record audio questions via microphone</li>
+<li>🎞️ View 8-frame surgical sequences in grid layout</li>
+<li>▶️ Flipbook animation (2 FPS) to visualize motion</li>
+<li>🎯 Real-time model inference with ground truth comparison</li>
+<li>📊 Question type filtering (20 categories)</li>
+<li>📈 Performance stats display in sidebar</li>
+</ul>
+<h3 id="3-reproduction-training">3. Reproduction (Training)</h3>
+<p>To reproduce the multi-video training run:</p>
+<pre class="hljs"><code><div><span class="hljs-comment"># Generate stratified train/eval/test splits</span>
+python3 create_multivideo_split.py
+
+<span class="hljs-comment"># Generate TTS audio (if not using pre-generated)</span>
+./generate_audio_multivideo.sh
+
+<span class="hljs-comment"># Run overnight training (8 epochs, early stopping)</span>
+./train_multivideo_overnight.sh
+</div></code></pre>
+<p><strong>Expected:</strong> Training will stop around epoch 5-6 due to early stopping (patience=3).</p>
+<h3 id="4-evaluation">4. Evaluation</h3>
+<p>Evaluate a trained checkpoint on the held-out test set:</p>
+<pre class="hljs"><code><div>python3 src/evaluate_checkpoint.py \
+    --checkpoint_path ./checkpoints/surgical_vqa_multivideo \
+    --eval_data_path test_multivideo.jsonl \
+    --frames_dir data/frames \
+    --audio_dir data/audio \
+    --output_file results/final_test_002004.jsonl
+</div></code></pre>
+<hr>
+<h2 id="%F0%9F%93%82-project-structure">📂 Project Structure</h2>
+<pre class="hljs"><code><div>SurgViVQA-Audio/
+├── src/
+│   ├── train_vqa.py                # Main training loop (QLoRA + audio grafting)
+│   ├── app.py                      # Streamlit Demo (Interactive inference)
+│   ├── evaluate_checkpoint.py      # Standalone evaluation script
+│   └── dataset.py                  # SurgicalVQADataset class
+├── docs/
+│   ├── demo_screenshot.png        # for embedded video
+│   ├── train_loss.png             # W&amp;B plot
+│   ├── eval_loss.png              # W&amp;B plot
+│   ├── data_distribution.md       # detailed stats
+│   └── data_stats.json            # for Streamlit app
+├── checkpoints/                    # Saved LoRA adapters
+│   └── surgical_vqa_multivideo/    # Best checkpoint (epoch 3.48)
+├── data/
+│   ├── frames/                     # Extracted video frames (by video ID)
+│   └── audio/                      # Generated TTS audio files
+├── scripts/
+│   ├── train_multivideo_overnight.sh    # Full training script
+│   ├── generate_audio_multivideo.sh     # TTS generation for 3 videos
+│   └── create_multivideo_split.py       # Stratified data splitting
+├── analyze_data_distribution.py    # Generate data stats (run anytime)
+└── README.md
+</div></code></pre>
+<hr>
+<h2 id="%F0%9F%94%AE-future-work">🔮 Future Work</h2>
+<h3 id="immediate-improvements">Immediate Improvements</h3>
+<ul>
+<li><strong>Higher Resolution:</strong> Scale from 384px → 768px to improve <code>tool_identification</code> (currently 75%, limited by resolution)</li>
+<li><strong>More Frames:</strong> Increase from 8 → 16 frames per sample to improve motion understanding (currently 45-54% on motion questions)</li>
+<li><strong>Model Upgrade:</strong> Test Qwen 2.5-VL or Qwen 3 (native video understanding) for temporal modeling</li>
+</ul>
+<h3 id="architectural-explorations">Architectural Explorations</h3>
+<ul>
+<li><strong>Video-Native Backbone:</strong> Replace frame-by-frame processing with true video encoding</li>
+<li><strong>Attention Optimization:</strong> Migrate from SDPA to FlashAttention-2 + Unsloth for 2-3x speedup</li>
+<li><strong>Audio Variations:</strong> Test different TTS voices/speeds for robustness (currently using single voice)</li>
+</ul>
+<hr>
+<h2 id="%F0%9F%8E%93-acknowledgments--citations">🎓 Acknowledgments &amp; Citations</h2>
+<h3 id="dataset">Dataset</h3>
+<p>I utilized the <strong>SurgViVQA</strong> dataset [1], converting the text questions to audio using edge-tts to simulate a spoken-query environment.</p>
+<p><strong>[1] SurgViVQA (2025)</strong>
+<em>Drago, M. O., et al.</em> &quot;SurgViVQA: Temporally-Grounded Video Question Answering for Surgical Scene Understanding.&quot; arXiv preprint arXiv:2511.03325.</p>
+<details>
+<summary>Click for BibTeX</summary>
+<pre class="hljs"><code><div>@misc{drago2025surgvivqa,
+      title={SurgViVQA: Temporally-Grounded Video Question Answering for Surgical Scene Understanding},
+      author={Mauro Orazio Drago et al.},
+      year={2025},
+      eprint={2511.03325},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+
+</div></code></pre>
+</details>
+<h3 id="models">Models</h3>
+<ul>
+<li><strong>Vision-Language:</strong> <a href="https://huggingface.co/Qwen/Qwen2-VL-7B-Instruct">Qwen2-VL-7B-Instruct</a></li>
+<li><strong>Audio Encoder:</strong> <a href="https://huggingface.co/openai/whisper-large-v3-turbo">Whisper Large v3 Turbo</a></li>
+</ul>
+<hr>
+<h2 id="%F0%9F%96%8A%EF%B8%8F-citing-this-work">🖊️ Citing This Work</h2>
+<p>A technical paper describing this project is currently in preparation. In the meantime, if you use this code or model, please cite the repository:</p>
+<pre class="hljs"><code><div>@software{abdullah2026surgvivqa,
+  author = {Abdullah, Kulsoom},
+  title = {SurgViVQA-Audio: Audio-Grafted Qwen2-VL for Surgical Video QA},
+  year = {2026},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  url = {[https://github.com/kulsoom-abdullah/SurgViVQA-Audio](https://github.com/kulsoom-abdullah/SurgViVQA-Audio)}
+}
+
+</div></code></pre>
+<hr>
+<h2 id="%F0%9F%93%9C-license">📜 License</h2>
+<p>This project is licensed under the <strong>Apache 2.0 License</strong>.</p>
+<p>You are free to use, modify, and distribute this software, provided that proper credit is given (see Citation above).</p>
+<ul>
+<li>See <a href="https://www.apache.org/licenses/LICENSE-2.0.txt">LICENSE</a> for the full text.</li>
+</ul>
+<hr>
+<h2 id="%F0%9F%93%A7-contact">📧 Contact</h2>
+<p><strong><a href="https://www.linkedin.com/in/kulsoomabdullah/">Kulsoom Abdullah</a></strong></p>
+<hr>
+<p><em>Built with: PyTorch, Transformers (custom fork), PEFT, Streamlit, Librosa, Edge-TTS</em></p>
+
+</body>
+</html>

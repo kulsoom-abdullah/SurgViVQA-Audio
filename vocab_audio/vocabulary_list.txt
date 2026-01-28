@@ -1,0 +1,303 @@
+Medical Vocabulary - Pronunciation Verification
+======================================================================
+
+Total unique words: 42
+Voice used: en-US-AriaNeural
+
+Words and sample contexts:
+----------------------------------------------------------------------
+
+Word: actively
+  Example: Is the scope actively moving throughout this clip?
+  Example: Is the scope actively moving throughout this clip?
+  Audio files:
+    - isolated/actively.mp3
+    - in_context/actively_context.mp3
+
+Word: advancing
+  Example: If moving, is the scope advancing forward?
+  Example: If moving, is the scope advancing forward?
+  Audio files:
+    - isolated/advancing.mp3
+    - in_context/advancing_context.mp3
+
+Word: anatomical
+  Example: At which anatomical site is the lesion located?
+  Example: At which anatomical site is the lesion located?
+  Audio files:
+    - isolated/anatomical.mp3
+    - in_context/anatomical_context.mp3
+
+Word: backward
+  Example: If moving, is the scope retracting backward?
+  Example: If moving, is the scope retracting backward?
+  Audio files:
+    - isolated/backward.mp3
+    - in_context/backward_context.mp3
+
+Word: blocking
+  Example: Is there a close-up occlusion blocking the view?
+  Example: Is there a close-up occlusion blocking the view?
+  Audio files:
+    - isolated/blocking.mp3
+    - in_context/blocking_context.mp3
+
+Word: bracket
+  Example: Into which millimeter bracket does the lesion size fall?
+  Example: Into which millimeter bracket does the lesion size fall?
+  Audio files:
+    - isolated/bracket.mp3
+    - in_context/bracket_context.mp3
+
+Word: captured
+  Example: Are these frames captured using NBI mode?
+  Example: Are these frames captured using NBI mode?
+  Audio files:
+    - isolated/captured.mp3
+    - in_context/captured_context.mp3
+
+Word: category
+  Example: Which histologic category matches the lesion?
+  Example: Which histologic category matches the lesion?
+  Audio files:
+    - isolated/category.mp3
+    - in_context/category_context.mp3
+
+Word: catheter
+  Example: Is the visible tool a catheter?
+  Example: Is the visible tool a catheter?
+  Audio files:
+    - isolated/catheter.mp3
+    - in_context/catheter_context.mp3
+
+Word: clearly
+  Example: Can you clearly observe clean mucosa in these frames?
+  Example: Can you clearly observe clean mucosa in these frames?
+  Audio files:
+    - isolated/clearly.mp3
+    - in_context/clearly_context.mp3
+
+Word: contrast
+  Example: Is contrast dye visible on the mucosal surface?
+  Example: Is contrast dye visible on the mucosal surface?
+  Audio files:
+    - isolated/contrast.mp3
+    - in_context/contrast_context.mp3
+
+Word: direction
+  Example: In which direction does the lesion drift over the frames?
+  Example: In which direction does the lesion drift over the frames?
+  Audio files:
+    - isolated/direction.mp3
+    - in_context/direction_context.mp3
+
+Word: endoscope
+  Example: Is the endoscope body visible?
+  Example: Is the endoscope body visible?
+  Audio files:
+    - isolated/endoscope.mp3
+    - in_context/endoscope_context.mp3
+
+Word: endoscopist
+  Example: Is the endoscopist flushing the scene?
+  Example: Is the endoscopist flushing the scene?
+  Audio files:
+    - isolated/endoscopist.mp3
+    - in_context/endoscopist_context.mp3
+
+Word: flushing
+  Example: Is the endoscopist flushing the scene?
+  Example: Is the endoscopist flushing the scene?
+  Audio files:
+    - isolated/flushing.mp3
+    - in_context/flushing_context.mp3
+
+Word: forward
+  Example: If moving, is the scope advancing forward?
+  Example: If moving, is the scope advancing forward?
+  Audio files:
+    - isolated/forward.mp3
+    - in_context/forward_context.mp3
+
+Word: histologic
+  Example: Which histologic category matches the lesion?
+  Example: Which histologic category matches the lesion?
+  Audio files:
+    - isolated/histologic.mp3
+    - in_context/histologic_context.mp3
+
+Word: histology
+  Example: What is the lesion histology?
+  Example: What is the lesion histology?
+  Audio files:
+    - isolated/histology.mp3
+    - in_context/histology_context.mp3
+
+Word: illuminates
+  Example: What lighting modality illuminates this sequence?
+  Example: What lighting modality illuminates this sequence?
+  Audio files:
+    - isolated/illuminates.mp3
+    - in_context/illuminates_context.mp3
+
+Word: instrument
+  Example: Which instrument is present in this clip?
+  Example: Which instrument is present in this clip?
+  Audio files:
+    - isolated/instrument.mp3
+    - in_context/instrument_context.mp3
+
+Word: lighting
+  Example: Which lighting mode is used in this sequence?
+  Example: Which lighting mode is used in this sequence?
+  Audio files:
+    - isolated/lighting.mp3
+    - in_context/lighting_context.mp3
+
+Word: located
+  Example: In which part of the colon is the lesion located?
+  Example: In which part of the colon is the lesion located?
+  Audio files:
+    - isolated/located.mp3
+    - in_context/located_context.mp3
+
+Word: matches
+  Example: Which histologic category matches the lesion?
+  Example: Which histologic category matches the lesion?
+  Audio files:
+    - isolated/matches.mp3
+    - in_context/matches_context.mp3
+
+Word: millimeter
+  Example: Into which millimeter bracket does the lesion size fall?
+  Example: Into which millimeter bracket does the lesion size fall?
+  Audio files:
+    - isolated/millimeter.mp3
+    - in_context/millimeter_context.mp3
+
+Word: modality
+  Example: What lighting modality illuminates this sequence?
+  Example: What lighting modality illuminates this sequence?
+  Audio files:
+    - isolated/modality.mp3
+    - in_context/modality_context.mp3
+
+Word: mucosal
+  Example: Is contrast dye visible on the mucosal surface?
+  Example: Is contrast dye visible on the mucosal surface?
+  Audio files:
+    - isolated/mucosal.mp3
+    - in_context/mucosal_context.mp3
+
+Word: observe
+  Example: Can you clearly observe clean mucosa in these frames?
+  Example: Can you clearly observe clean mucosa in these frames?
+  Audio files:
+    - isolated/observe.mp3
+    - in_context/observe_context.mp3
+
+Word: obstruction
+  Example: Does a close-up obstruction block the field of view?
+  Example: Does a close-up obstruction block the field of view?
+  Audio files:
+    - isolated/obstruction.mp3
+    - in_context/obstruction_context.mp3
+
+Word: occlusion
+  Example: Is there a close-up occlusion blocking the view?
+  Example: Is there a close-up occlusion blocking the view?
+  Audio files:
+    - isolated/occlusion.mp3
+    - in_context/occlusion_context.mp3
+
+Word: outside
+  Example: Is the scope outside the patient in this sequence?
+  Example: Is the scope outside the patient in this sequence?
+  Audio files:
+    - isolated/outside.mp3
+    - in_context/outside_context.mp3
+
+Word: patient
+  Example: Is the scope outside the patient in this sequence?
+  Example: Is the scope outside the patient in this sequence?
+  Audio files:
+    - isolated/patient.mp3
+    - in_context/patient_context.mp3
+
+Word: positioned
+  Example: Is the scope positioned outside the patient here?
+  Example: Is the scope positioned outside the patient here?
+  Audio files:
+    - isolated/positioned.mp3
+    - in_context/positioned_context.mp3
+
+Word: present
+  Example: Is blue dye present on the mucosa?
+  Example: Is blue dye present on the mucosa?
+  Audio files:
+    - isolated/present.mp3
+    - in_context/present_context.mp3
+
+Word: primarily
+  Example: Is the scope primarily advancing or withdrawing in this sequence?
+  Example: Is the scope primarily advancing or withdrawing in this sequence?
+  Audio files:
+    - isolated/primarily.mp3
+    - in_context/primarily_context.mp3
+
+Word: pushing
+  Example: When motion occurs, is the scope pushing forward?
+  Example: When motion occurs, is the scope pushing forward?
+  Audio files:
+    - isolated/pushing.mp3
+    - in_context/pushing_context.mp3
+
+Word: quadrant
+  Example: In what screen quadrant does the lesion appear?
+  Example: In what screen quadrant does the lesion appear?
+  Audio files:
+    - isolated/quadrant.mp3
+    - in_context/quadrant_context.mp3
+
+Word: retracting
+  Example: If moving, is the scope retracting backward?
+  Example: If moving, is the scope retracting backward?
+  Audio files:
+    - isolated/retracting.mp3
+    - in_context/retracting_context.mp3
+
+Word: sequence
+  Example: Is clean mucosa visible in this sequence?
+  Example: Is clean mucosa visible in this sequence?
+  Audio files:
+    - isolated/sequence.mp3
+    - in_context/sequence_context.mp3
+
+Word: surface
+  Example: Is contrast dye visible on the mucosal surface?
+  Example: Is contrast dye visible on the mucosal surface?
+  Audio files:
+    - isolated/surface.mp3
+    - in_context/surface_context.mp3
+
+Word: throughout
+  Example: Is the scope actively moving throughout this clip?
+  Example: Is the scope actively moving throughout this clip?
+  Audio files:
+    - isolated/throughout.mp3
+    - in_context/throughout_context.mp3
+
+Word: visible
+  Example: Is clean mucosa visible in this sequence?
+  Example: Is clean mucosa visible in this sequence?
+  Audio files:
+    - isolated/visible.mp3
+    - in_context/visible_context.mp3
+
+Word: withdrawing
+  Example: Is the scope primarily advancing or withdrawing in this sequence?
+  Example: Is the scope primarily advancing or withdrawing in this sequence?
+  Audio files:
+    - isolated/withdrawing.mp3
+    - in_context/withdrawing_context.mp3
+

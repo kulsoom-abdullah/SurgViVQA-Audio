@@ -1,0 +1,72 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Data (too large for Git - will sync from R2/network volume)
+audio/
+dataset/
+data/frames/
+data/audio/
+*.mp3
+*.wav
+*.mp4
+*.avi
+
+# Images - but allow documentation images in docs/
+*.jpg
+*.png
+!docs/*.jpg
+!docs/*.png
+
+# Checkpoints (upload to HuggingFace instead)
+checkpoints/
+*.pt
+*.pth
+*.bin
+*.safetensors
+
+# Logs and results
+wandb/
+results/
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Compressed archives
+*.tar
+*.tar.gz
+*.zip
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# HuggingFace cache
+.cache/
+
+# Model files (too large)
+model.safetensors
+pytorch_model.bin
+
+# Keep small test data for CI/validation
+!test_set/*.jsonl
