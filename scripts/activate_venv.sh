@@ -13,6 +13,6 @@ if [ -d "$VENV_PATH" ]; then
     echo "PyTorch: $(python -c 'import torch; print(torch.__version__)' 2>/dev/null || echo 'Not installed')"
 else
     echo "❌ Virtual environment not found at: $VENV_PATH"
-    echo "Run setup_runpod_venv.sh first"
+    echo "Run scripts/setup_runpod_venv.sh first"
     exit 1
 fi
