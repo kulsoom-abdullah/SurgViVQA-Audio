@@ -6,6 +6,9 @@
 
 set -e  # Exit on error
 
+# Ensure we run from the project root
+cd "$(dirname "$0")/.."
+
 # Activate virtual environment if it exists
 VENV_PATH="/workspace/venvs/surg-audio"
 if [ -d "$VENV_PATH" ]; then

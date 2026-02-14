@@ -18,18 +18,15 @@ test_set/
 └── out_002-001.jsonl           # 50 out-domain questions
 ```
 
-### Utility Scripts
+### Utility & Setup Scripts (scripts/)
 ```
-verify_setup.py                  # Verify frames/audio are ready
-generate_audio_subset.py         # Generate TTS audio
-```
-
-### Setup Scripts
-```
-setup_runpod_venv.sh            # First-time setup (run once)
-activate_venv.sh                # Quick activation helper
-download_frames_figshare.sh     # Download frames from Figshare
-run_all_baselines.sh            # Run all experiments
+scripts/
+├── verify_setup.py              # Verify frames/audio are ready
+├── generate_audio_subset.py     # Generate TTS audio
+├── setup_runpod_venv.sh         # First-time setup (run once)
+├── activate_venv.sh             # Quick activation helper
+├── download_frames_figshare.sh  # Download frames from Figshare
+└── run_all_baselines.sh         # Run all experiments
 ```
 
 **Total Upload Size: ~1-2MB** (all text files)
@@ -124,12 +121,7 @@ export RUNPOD_HOST=123.45.67.89
 scp -P $RUNPOD_PORT -r \
     baselines/ \
     test_set/ \
-    verify_setup.py \
-    generate_audio_subset.py \
-    setup_runpod_venv.sh \
-    activate_venv.sh \
-    download_frames_figshare.sh \
-    run_all_baselines.sh \
+    scripts/ \
     root@$RUNPOD_HOST:/workspace/SurgViVQA-Audio/
 ```
 
@@ -139,12 +131,7 @@ scp -P $RUNPOD_PORT -r \
 
 ## 🧹 Cleanup on Mac
 
-Run this to remove files you don't need locally:
-```bash
-bash cleanup_local.sh
-```
-
 **Keep on Mac:**
-- `RUNPOD_CHECKLIST.md` (your reference guide)
-- Full dataset files (in case you need to create new test sets)
-- This file (`ESSENTIAL_FILES.md`)
+- `docs/` (Documentation)
+- Full dataset files in `data/`
+- This file (`docs/ESSENTIAL_FILES.md`)

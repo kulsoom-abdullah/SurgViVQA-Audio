@@ -10,7 +10,7 @@ from collections import defaultdict
 from pathlib import Path
 
 def create_test_set(
-    input_file="out_template.jsonl",
+    input_file="data/out_template.jsonl",
     output_file="test_set/test_samples.jsonl",
     test_size=100,
     seed=42,
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Create test set for SurgViVQA evaluation")
-    parser.add_argument("--input", default="out_template.jsonl", help="Input JSONL file")
+    parser.add_argument("--input", default="data/out_template.jsonl", help="Input JSONL file")
     parser.add_argument("--output", default="test_set/test_samples.jsonl", help="Output JSONL file")
     parser.add_argument("--size", type=int, default=100, help="Test set size")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")

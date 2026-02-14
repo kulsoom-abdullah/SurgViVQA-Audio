@@ -4,8 +4,8 @@ import re
 
 # --- Configuration ---
 FILES_TO_ANALYZE = {
-    "In-Template (Robotic)": "in_template.jsonl",
-    "Out-Template (Natural)": "out_template.jsonl"
+    "In-Template (Robotic)": "data/in_template.jsonl",
+    "Out-Template (Natural)": "data/out_template.jsonl"
 }
 # Simple regex to catch potential acronyms (2+ capital letters together)
 ACRONYM_RE = re.compile(r'\b[A-Z]{2,}\b')

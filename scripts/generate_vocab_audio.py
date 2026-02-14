@@ -13,8 +13,8 @@ from pathlib import Path
 
 # Configuration
 VOICE = "en-US-AriaNeural"
-OUTPUT_DIR = Path("vocab_audio")
-FILES = ["in_template.jsonl", "out_template.jsonl"]
+OUTPUT_DIR = Path("data/vocab_audio")
+FILES = ["data/in_template.jsonl", "data/out_template.jsonl"]
 
 async def generate_audio(text, output_file):
     """Generate audio for a given text"""
