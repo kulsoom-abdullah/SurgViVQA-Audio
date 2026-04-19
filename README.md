@@ -88,6 +88,25 @@ I compared an end-to-end audio-adapted model (raw audio → Whisper encoder embe
 
 ---
 
+### Baseline Comparison Across Qwen Generations (Text + Vision, No Audio)
+
+To isolate vision encoder capability across model generations, I evaluated Qwen 2.0, 2.5, and 3.0 using text-only queries on the same held-out test set. Audio was intentionally excluded: multimodal projectors are architecturally specific to each model's hidden dimension, so retraining the audio adapter per generation would conflate adapter quality with encoder quality. Text + vision gives a direct apples-to-apples comparison.
+
+| Model | Zero-Shot Accuracy | Primary Gain |
+|---|---|---|
+| Qwen 2.0-VL-7B | 36.0% | Baseline |
+| Qwen 2.5-VL-7B | 39.4% | Marginal (+3.4%) |
+| **Qwen 3.0-VL-8B** | **54.1%** | Step change in texture/lighting recognition (+14.7%) |
+| Qwen 3.0-VL-8B (SFT) | **74.0%** | Fine-tuning on multi-video train set |
+
+Qwen 2.5's marginal gain made it a poor SFT candidate; Qwen 3.0's jump identified it as the right foundation. The SFT experiment was run only on Qwen 3.0.
+
+**Key finding:** Even Qwen 3.0's stronger vision encoder stays at random baseline (20%) on `lesion_motion_direction`. This confirms the bottleneck is the 1.12-second sampling window, not model capacity — no vision encoder improvement can recover signal that wasn't captured.
+
+Prediction files: `results/qwen2_zeroshot_test.jsonl`, `results/qwen25_zeroshot_test.jsonl`, `results/qwen3_zeroshot_test.jsonl`, `results/qwen3_finetuned_test.jsonl`
+
+---
+
 ### Performance by Question Type (Held-Out Test Set - Procedure 002-004)
 
 **Perfect Scores (100%):**
@@ -145,9 +164,10 @@ I compared an end-to-end audio-adapted model (raw audio → Whisper encoder embe
 - **Fine-grained spatial reasoning** (lesion position quadrants: 20%)
 
 **Root causes:**
-1. **Frame independence:** Model processes 8 frames independently, lacks video-native temporal modeling
-2. **Resolution constraint:** 384px may be too low for precise spatial localization
-3. **Limited test variety:** Some perfect scores (100%) are due to single-class test sets (all <5mm, all NBI, all forceps)
+1. **Dataset sampling window:** Visual audit (April 2026) revealed the 8-frame, stride-4 window covers only ~1.1 seconds of video. For slow-moving lesions, the sampled frames are nearly identical — the motion arc described in the ground truth label is not present in the input. This is upstream of any model limitation.
+2. **Frame independence:** Model processes 8 frames independently, lacks video-native temporal modeling. Even where motion is visible, the architecture cannot track it across frames.
+3. **Resolution constraint:** 384px may be too low for precise spatial localization (affects `tool_identification`, `lesion_screen_position`)
+4. **Limited test variety:** Some perfect scores (100%) are due to single-class test sets (all <5mm, all NBI, all forceps)
 
 📊 **Full evaluation:** Run evaluation script to generate detailed per-sample results
 
@@ -289,6 +309,49 @@ streamlit run src/app.py --server.port 8501 --server.address 0.0.0.0
 - 📊 Question type filtering (20 categories)
 - 📈 Performance stats display in sidebar
 
+### 🔍 Data Viewer
+
+Lightweight local browser for inspecting dataset samples and overlaying SFT/zero-shot model predictions. No GPU or extra dependencies required.
+
+**Generate the viewer:**
+```bash
+# Browse-only (no predictions)
+python scripts/generate_viewer_html.py --frames_dir dataset/frames
+
+# With predictions overlay (e.g. qwen3 zero-shot)
+python scripts/generate_viewer_html.py \
+    --frames_dir dataset/frames \
+    --predictions results/qwen3_zeroshot_test.jsonl \
+    --out viewer/data_viewer_qwen3.html
+```
+
+**Launch:**
+```bash
+python -m http.server 8080
+# open http://localhost:8080/viewer/data_viewer.html
+```
+
+**Usage:**
+- Set frame directory to wherever REAL-Colon frames are extracted (`dataset/frames/`)
+- Optionally load a predictions JSONL to overlay model outputs
+- Toggle between `in_template` / `out_template` question phrasing
+- Filter by question type to examine specific failure modes
+- Filter by correct / wrong (when predictions loaded)
+- Keyboard: `←` / `→` to navigate samples
+
+**Download frames from Figshare:**
+```bash
+# Step 1: see what's available and get per-video download commands
+python scripts/download_sample_frames.py
+
+# Step 2: after extracting, verify coverage
+python scripts/download_sample_frames.py --verify --output_dir dataset/frames
+```
+
+**Purpose:** Confirm whether 8-frame sequences contain sufficient visual signal for each question type — foundation for documenting SFT failure modes before GRPO.
+
+---
+
 ### 3. Reproduction (Training)
 
 To reproduce the multi-video training run:
@@ -371,8 +434,8 @@ SurgViVQA-Audio/
 
 ### Immediate Improvements
 * **Higher Resolution:** Scale from 384px → 768px to improve `tool_identification` (currently 66%, limited by resolution)
-* **More Frames:** Increase from 8 → 16 frames per sample to improve motion understanding (currently 45-54% on motion questions)
-* **Model Upgrade:** Test Qwen2.5-VL or other video-capable VLMs for improved temporal modeling.
+* **Wider Sampling Window:** Rather than more frames from the same ~1-second clip, resample the original videos over a 3–5 second window at lower FPS. The current stride-4 design means 8→16 frames would still cover the same 1-second arc — the window span is the constraint, not the frame count.
+* **Model Upgrade:** Test video-native VLMs (e.g., Qwen2.5-VL, MedGemma) for categories where visual signal IS present but the model still underperforms (`tool_identification`, `occlusion_check`).
 
 ### Architectural Explorations
 * **Video-Native Backbone:** Replace frame-by-frame processing with true video encoding

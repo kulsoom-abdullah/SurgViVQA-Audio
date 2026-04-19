@@ -70,3 +70,12 @@ pytorch_model.bin
 
 # Keep small test data for CI/validation
 !test_set/*.jsonl
+.env.local
+
+# Private research notes — do not publish
+HALLUCINATION_FINDINGS.md
+HALLUCINATION_FINDINGS.pdf
+MEDGEMMA_COMPETITION_ASSESSMENT.md
+MENTOR_UPDATE.md
+RESEARCH_CONSULTATION_PROMPT.md
+Claude.md
