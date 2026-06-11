@@ -170,11 +170,13 @@ def evaluate(args):
 
             result = {
                 'question_id': sample['id'],
+                'question_type': sample.get('question_type', 'unknown'),
                 'question': sample['question'],
                 'ground_truth': sample['answer'],
                 'short_answer': sample['short_answer'],
                 'predicted_answer': predicted,
-                'correct': int(is_correct)
+                'correct': int(is_correct),
+                'exact_match': int(is_correct)
             }
             results.append(result)
 

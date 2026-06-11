@@ -28,7 +28,7 @@
 * **Result:** **63.4% Accuracy** on held-out test set (+17.4 points over [zero-shot baseline](baselines/baseline2_audio_image.py)).
 
 ### 4. Deployment (Streamlit Demo)
-* **Output:** Built an interactive app ([`src/app.py`](src/app.py)) with "Flipbook" animation to visualize temporal motion for clinicians.
+* **Output:** Built an interactive app ([`src/app.py`](src/app.py)) with "Flipbook" animation to visualize the sampled frame sequence for clinicians.
 * **Features:** Question type filtering, 8-frame grid view, animated playback (2 FPS), audio recording with live inference.
 
 ---
@@ -101,7 +101,7 @@ To isolate vision encoder capability across model generations, I evaluated Qwen 
 
 Qwen 2.5's marginal gain made it a poor SFT candidate; Qwen 3.0's jump identified it as the right foundation. The SFT experiment was run only on Qwen 3.0.
 
-**Key finding:** Even Qwen 3.0's stronger vision encoder stays at random baseline (20%) on `lesion_motion_direction`. This confirms the bottleneck is the 1.12-second sampling window, not model capacity — no vision encoder improvement can recover signal that wasn't captured.
+**Key finding:** Every generation stays at chance on `lesion_motion_direction` — Qwen 2.0/2.5/3.0 zero-shot and Qwen 3.0 fine-tuned score 16–22% against a 20% random baseline (5-way) — ruling out model capacity as the cause. The chance-level scores are mode collapse onto a learned prior, not weak-but-real motion reading (see Root Causes below). The bottleneck is the input: frames are sampled from a fixed position per question, so for many motion questions the labeled motion is not contained in the sampled frames at all, and no encoder improvement can recover signal that was never captured.
 
 Prediction files: `results/qwen2_zeroshot_test.jsonl`, `results/qwen25_zeroshot_test.jsonl`, `results/qwen3_zeroshot_test.jsonl`, `results/qwen3_finetuned_test.jsonl`
 
@@ -146,7 +146,7 @@ Prediction files: `results/qwen2_zeroshot_test.jsonl`, `results/qwen25_zeroshot_
 **Hardest Questions (<25%):**
 | Question Type | Accuracy | Analysis |
 |---------------|----------|----------|
-| **lesion_motion_direction** | **20.0% (10/50)** | 5-way classification, temporal modeling limitation |
+| **lesion_motion_direction** | **20.0% (10/50)** | mode collapse onto learned prior (see Root Causes) |
 | **lesion_screen_position** | **20.0% (10/50)** | 4-way spatial reasoning (quadrant detection) |
 
 ---
@@ -164,10 +164,12 @@ Prediction files: `results/qwen2_zeroshot_test.jsonl`, `results/qwen25_zeroshot_
 - **Fine-grained spatial reasoning** (lesion position quadrants: 20%)
 
 **Root causes:**
-1. **Dataset sampling window:** Visual audit (April 2026) revealed the 8-frame, stride-4 window covers only ~1.1 seconds of video. For slow-moving lesions, the sampled frames are nearly identical — the motion arc described in the ground truth label is not present in the input. This is upstream of any model limitation.
-2. **Frame independence:** Model processes 8 frames independently, lacks video-native temporal modeling. Even where motion is visible, the architecture cannot track it across frames.
+1. **Mode collapse, not weak temporal reasoning:** Error analysis ([`src/analyze_errors.py`](src/analyze_errors.py)) of the fine-tuned Qwen 3.0 run ([`results/qwen3_finetuned_test.jsonl`](results/qwen3_finetuned_test.jsonl)) shows the model defaults to a learned prior on `lesion_motion_direction`: it answers only "downward" (38/50) or "upward" (12/50) and never predicts left, right, or stable — against a balanced 10-per-class ground truth. Every "correct" answer (9 down + 2 up = 22%) is a coincidental overlap between that prior and the label, not motion reading. The Qwen 2.0→2.5→3.0 ablation (16–22%, zero-shot and fine-tuned) rules out model capacity as the cause.
+2. **Motion signal is not reliably present in the input:** The dataset samples 8 frames (stride 4, ~1.1s at 25 fps) from a fixed position for every question, regardless of where the labeled motion occurs in the source video — visual audit of failure cases (April 2026) found that for many motion-direction questions the labeled motion is not contained in the 8 sampled frames at all. The pipeline also feeds frames as independent images (`images=`, not the `videos=` pathway), so even motion that is present receives no temporal encoding.
 3. **Resolution constraint:** 384px may be too low for precise spatial localization (affects `tool_identification`, `lesion_screen_position`)
 4. **Limited test variety:** Some perfect scores (100%) are due to single-class test sets (all <5mm, all NBI, all forceps)
+
+**Hypothesized fix (future work — not yet run):** Targeted frame resampling — re-extracting frames aligned to where the labeled motion actually occurs — is the precondition. Switching to the `videos=` pathway (M-RoPE temporal encoding) alone would not fix this: temporal encoding cannot recover motion that is absent from the frames. Neither change has been run, so the fix is hypothesized, not demonstrated.
 
 📊 **Full evaluation:** Run evaluation script to generate detailed per-sample results
 
@@ -434,11 +436,11 @@ SurgViVQA-Audio/
 
 ### Immediate Improvements
 * **Higher Resolution:** Scale from 384px → 768px to improve `tool_identification` (currently 66%, limited by resolution)
-* **Wider Sampling Window:** Rather than more frames from the same ~1-second clip, resample the original videos over a 3–5 second window at lower FPS. The current stride-4 design means 8→16 frames would still cover the same 1-second arc — the window span is the constraint, not the frame count.
+* **Targeted Frame Resampling:** Re-extract frames from the source videos aligned to where the labeled motion actually occurs, rather than taking more frames from the same fixed ~1-second clip. The current stride-4 design means 8→16 frames would still cover the same fixed window — frame selection is the constraint, not the frame count. Not yet run; the expected gain is hypothesized, not demonstrated.
 * **Model Upgrade:** Test video-native VLMs (e.g., Qwen2.5-VL, MedGemma) for categories where visual signal IS present but the model still underperforms (`tool_identification`, `occlusion_check`).
 
 ### Architectural Explorations
-* **Video-Native Backbone:** Replace frame-by-frame processing with true video encoding
+* **Video-Native Backbone:** Replace frame-by-frame `images=` processing with true video encoding (`videos=` pathway, M-RoPE). On its own this would not fix the motion categories — frames must first contain readable motion (see Targeted Frame Resampling) — and it has not been run.
 * **Attention Optimization:** Migrate from SDPA to FlashAttention-2 + Unsloth for 2-3x speedup
 * **Audio Variations:** Test different TTS voices/speeds for robustness (currently using single voice)
 

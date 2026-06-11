@@ -37,7 +37,12 @@ checkpoints/
 
 # Logs and results
 wandb/
-results/
+results/*
+# Allow only the four cross-generation comparison runs cited in the README
+!results/qwen2_zeroshot_test.jsonl
+!results/qwen25_zeroshot_test.jsonl
+!results/qwen3_zeroshot_test.jsonl
+!results/qwen3_finetuned_test.jsonl
 *.log
 logs/
 
