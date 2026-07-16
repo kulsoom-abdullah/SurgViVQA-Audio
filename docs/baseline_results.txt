@@ -48,6 +48,7 @@
   Date: January 15, 2026
   Model: 4-bit Quantized Audio-Grafted Qwen2-VL-7B + LoRA adapters
   Hardware: RunPod 2x RTX 4090 (48GB total)
+  Full-run hardware record: W&B run surgical-vqa-multivideo-overnight-20260116-055704 (2026-01-16, 348.7 min, 2x RTX 4090, gpu_count=2, both GPUs ~89% mean util) -> docs/run_evidence/
 
   Experiment 1: 50-Sample Overfit Test (Validation Run)
   ┌──────────────────┬────────────────────────────────────────────────────────────────┐

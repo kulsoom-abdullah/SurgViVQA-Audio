@@ -1,0 +1,89 @@
+{
+  "run": "surgical-vqa-multivideo-overnight-20260116-055704",
+  "run_id": "4owcddle",
+  "run_path": "AI_Healthcare/surgical-vqa/4owcddle",
+  "sample_rows_in_event_stream": 500,
+  "note": "W&B system metrics are sampled node-wide by the rank-0 agent, so both physical GPUs appear even though only rank 0 logs to W&B under torchrun.",
+  "per_gpu": {
+    "gpu.0": {
+      "utilization_pct": {
+        "n": 255,
+        "mean": 89.25,
+        "median": 100,
+        "min": 0,
+        "max": 100
+      },
+      "memory_allocated_pct": {
+        "n": 255,
+        "mean": 72.72,
+        "median": 67.73,
+        "min": 59.02,
+        "max": 93.14
+      },
+      "memory_allocated_gib": {
+        "n": 255,
+        "mean": 17.44,
+        "median": 16.25,
+        "max": 22.34
+      },
+      "power_watts": {
+        "n": 255,
+        "mean": 311.5,
+        "median": 344.32,
+        "min": 78.18,
+        "max": 359.5
+      },
+      "temp_celsius": {
+        "n": 255,
+        "mean": 58.71,
+        "median": 59,
+        "min": 51,
+        "max": 62
+      }
+    },
+    "gpu.1": {
+      "utilization_pct": {
+        "n": 255,
+        "mean": 89.65,
+        "median": 100,
+        "min": 0,
+        "max": 100
+      },
+      "memory_allocated_pct": {
+        "n": 255,
+        "mean": 75.58,
+        "median": 70.41,
+        "min": 61.08,
+        "max": 95.17
+      },
+      "memory_allocated_gib": {
+        "n": 255,
+        "mean": 18.13,
+        "median": 16.89,
+        "max": 22.83
+      },
+      "power_watts": {
+        "n": 255,
+        "mean": 312.66,
+        "median": 344.85,
+        "min": 82.25,
+        "max": 358.79
+      },
+      "temp_celsius": {
+        "n": 255,
+        "mean": 61.39,
+        "median": 62,
+        "min": 53,
+        "max": 66
+      }
+    }
+  },
+  "both_gpu_check": {
+    "gpu.0_samples_above_5pct_util": "239/255",
+    "gpu.1_samples_above_5pct_util": "239/255",
+    "mean_util_gpu.0_pct": 89.3,
+    "mean_util_gpu.1_pct": 89.7,
+    "util_symmetry_ratio_gpu1_over_gpu0": 1.005,
+    "interpretation": "Both devices sustain near-identical utilization (ratio ~1.0) concurrently under a single training program. This is the expected signature of data-parallel replication (DDP). Pipeline/model-parallel sharding (e.g. device_map='auto') instead produces asymmetric or alternating per-device utilization."
+  }
+}

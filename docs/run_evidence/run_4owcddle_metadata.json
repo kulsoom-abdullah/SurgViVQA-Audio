@@ -1,0 +1,104 @@
+{
+  "_redactions": [
+    "email removed (PII)"
+  ],
+  "args": [
+    "--output_dir",
+    "./checkpoints/surgical_vqa_multivideo",
+    "--run_name",
+    "surgical-vqa-multivideo-overnight-20260116-055704",
+    "--train_data_path",
+    "train_multivideo.jsonl",
+    "--eval_data_path",
+    "eval_multivideo.jsonl",
+    "--frames_dir",
+    "data/frames",
+    "--audio_dir",
+    "data/audio",
+    "--eval_audio_dir",
+    "data/audio",
+    "--per_device_train_batch_size",
+    "1",
+    "--gradient_accumulation_steps",
+    "4",
+    "--per_device_eval_batch_size",
+    "1",
+    "--eval_accumulation_steps",
+    "4",
+    "--learning_rate",
+    "2e-4",
+    "--num_train_epochs",
+    "8",
+    "--warmup_ratio",
+    "0.05",
+    "--do_eval",
+    "--eval_strategy",
+    "steps",
+    "--eval_steps",
+    "100",
+    "--save_strategy",
+    "steps",
+    "--save_steps",
+    "100",
+    "--save_total_limit",
+    "3",
+    "--load_best_model_at_end",
+    "True",
+    "--metric_for_best_model",
+    "eval_loss",
+    "--greater_is_better",
+    "False",
+    "--early_stopping_patience",
+    "3",
+    "--bf16",
+    "True",
+    "--logging_steps",
+    "20",
+    "--report_to",
+    "wandb"
+  ],
+  "codePath": "src/train_vqa.py",
+  "codePathLocal": "src/train_vqa.py",
+  "cpu_count": 64,
+  "cpu_count_logical": 128,
+  "cudaVersion": "12.4",
+  "disk": {
+    "/": {
+      "total": "21474836480",
+      "used": "17179230208"
+    }
+  },
+  "executable": "/workspace/venvs/surg-audio/bin/python",
+  "git": {
+    "commit": "a99924330edc1beb691ea59d3cb4ee45f3c60029",
+    "remote": "https://github.com/kulsoom-abdullah/SurgViVQA-Audio.git"
+  },
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "gpu_count": 2,
+  "gpu_nvidia": [
+    {
+      "architecture": "Ada",
+      "cudaCores": 16384,
+      "memoryTotal": "25757220864",
+      "name": "NVIDIA GeForce RTX 4090",
+      "uuid": "GPU-1cfcb1ca-200d-fed5-73ad-0a0864a7bf7c"
+    },
+    {
+      "architecture": "Ada",
+      "cudaCores": 16384,
+      "memoryTotal": "25757220864",
+      "name": "NVIDIA GeForce RTX 4090",
+      "uuid": "GPU-99d5dbb5-d5f0-a102-5f1f-90cab51f6ed4"
+    }
+  ],
+  "host": "11045dcf6e2d",
+  "memory": {
+    "total": "540844142592"
+  },
+  "os": "Linux-6.8.0-60-generic-x86_64-with-glibc2.35",
+  "program": "/workspace/SurgViVQA-Audio/src/train_vqa.py",
+  "python": "CPython 3.11.10",
+  "root": "/workspace/SurgViVQA-Audio",
+  "startedAt": "2026-01-16T05:58:01.514341Z",
+  "writerId": "x45fwhms04z0sj2votcgkuzt6hds1z9y"
+}
