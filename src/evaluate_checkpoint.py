@@ -9,7 +9,27 @@ python evaluate_checkpoint.py \
     --frames_dir dataset/frames \
     --audio_dir audio/out_002-001 \
     --output_file results/eval_results.jsonl \
-    --batch_size 1
+    --batch_size 1 \
+    --input_mode audio_text
+
+--input_mode selects the ablation arm. All arms share this exact harness
+(loader, greedy decode, substring scorer); only the prompt content changes,
+so the arms are provably identical except the intended variable.
+
+  audio_text       (default) reproduces training/deployment: 1500 spoken-question
+                   audio tokens + the question as text. Use this as the sanity gate.
+  text_only        question as text, NO audio tokens / features (standard Qwen2-VL layout).
+  audio_only       question via audio only; question text removed from the prompt.
+  mismatched_audio correct question text, but the audio is a DIFFERENT sample's
+                   spoken question (in-distribution control: if the model reads audio,
+                   the wrong audio should pull the answer off).
+
+IMPORTANT (post-hoc probe, not a clean isolation): the checkpoint was TRAINED with
+audio+text both present. text_only / audio_only therefore carry a train/test prompt
+mismatch and their DROPS are ambiguous; mismatched_audio stays in-distribution and is
+the cleanest test of whether the audio content is read at all. Audio is only live when
+the FORKED transformers is installed (see the ablation runbook); with stock transformers
+the audio pathway is silently inert.
 """
 
 import warnings
@@ -49,6 +69,27 @@ def load_frames(frame_names, frames_dir, max_size=384):
             images.append(Image.new('RGB', (224, 224), color='black'))
 
     return images
+
+def build_mismatch_map(eval_data):
+    """Deterministically pair each sample with a DIFFERENT sample whose short_answer
+    differs, so the spoken (audio) question conflicts with the correct text question.
+
+    Returns a list `m` where eval_data[m[i]] supplies the audio for sample i. Pairing
+    scans forward with wraparound to the first differing short_answer, so the map is
+    reproducible run-to-run and every sample's audio asks a question with a different
+    answer than its own. Written to each result row as audio_source_id for auditability.
+    """
+    n = len(eval_data)
+    mapping = []
+    for i in range(n):
+        j = (i + 1) % n
+        steps = 0
+        while (eval_data[j].get('short_answer', '').lower()
+               == eval_data[i].get('short_answer', '').lower()) and steps < n:
+            j = (j + 1) % n
+            steps += 1
+        mapping.append(j)
+    return mapping
 
 def evaluate(args):
     print("="*80)
@@ -102,51 +143,72 @@ def evaluate(args):
     eval_data = [json.loads(line) for line in open(args.eval_data_path)]
     print(f"✓ Loaded {len(eval_data)} samples")
 
+    # Ablation arm: precompute the audio-source pairing only when needed
+    mismatch_map = build_mismatch_map(eval_data) if args.input_mode == "mismatched_audio" else None
+
     # Run evaluation
     results = []
     correct = 0
     total = 0
 
-    print(f"\n🚀 Running evaluation (batch_size={args.batch_size})...")
+    print(f"\n🚀 Running evaluation (input_mode={args.input_mode}, batch_size={args.batch_size})...")
 
-    for sample in tqdm(eval_data, desc="Evaluating"):
+    for idx, sample in enumerate(tqdm(eval_data, desc="Evaluating")):
         try:
-            # Load audio
-            audio_path = Path(args.audio_dir) / f"{sample['id']}.mp3"
-            if audio_path.exists():
-                y, _ = librosa.load(audio_path, sr=16000, mono=True)
+            # --- Resolve ablation arm (see --input_mode) ---
+            use_audio = args.input_mode in ("audio_text", "audio_only", "mismatched_audio")
+            # only audio_only drops the question text; mismatched_audio keeps the CORRECT
+            # text and swaps the audio, so it stays in the training (audio+text) distribution
+            include_question = args.input_mode in ("audio_text", "text_only", "mismatched_audio")
+            if args.input_mode == "mismatched_audio":
+                audio_id = eval_data[mismatch_map[idx]]['id']  # spoken question from a DIFFERENT sample
             else:
-                y = torch.zeros(16000 * 2)
+                audio_id = sample['id']
 
-            audio_inputs = feature_extractor(y, sampling_rate=16000, return_tensors="pt")
-            input_features = audio_inputs.input_features.to(model.device).to(torch.bfloat16)
+            # Load audio (only when the arm uses it)
+            input_features = None
+            if use_audio:
+                audio_path = Path(args.audio_dir) / f"{audio_id}.mp3"
+                if audio_path.exists():
+                    y, _ = librosa.load(audio_path, sr=16000, mono=True)
+                else:
+                    y = torch.zeros(16000 * 2)
+                audio_inputs = feature_extractor(y, sampling_rate=16000, return_tensors="pt")
+                input_features = audio_inputs.input_features.to(model.device).to(torch.bfloat16)
 
             # Load frames
             images = load_frames(sample['frames'], args.frames_dir, max_size=args.max_image_size)
 
-            # Build prompt
+            # Build prompt. Instruction wording is held CONSTANT across arms; the only
+            # variables are (a) audio presence and (b) question-text presence.
+            if include_question:
+                prompt_text = f"User Question: {sample['question']}\nAnswer the question concisely based on the visual and audio evidence."
+            else:
+                # bare instruction, no dangling "User Question:" label
+                prompt_text = "Answer the question concisely based on the visual and audio evidence."
             content = [{"type": "image"} for _ in images]
-            content.append({
-                "type": "text",
-                "text": f"User Question: {sample['question']}\nAnswer the question concisely based on the visual and audio evidence."
-            })
+            content.append({"type": "text", "text": prompt_text})
             messages = [{"role": "user", "content": content}]
 
             text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
             batch = processor(text=[text], images=images, return_tensors="pt")
 
-            # Inject audio tokens
-            AUDIO_TOKEN_ID = 151657
-            NUM_AUDIO_TOKENS = 1500
+            if use_audio:
+                # Inject 1500 audio tokens ahead of the vision/text content (training layout)
+                AUDIO_TOKEN_ID = 151657
+                NUM_AUDIO_TOKENS = 1500
 
-            audio_tokens = torch.tensor([[AUDIO_TOKEN_ID] * NUM_AUDIO_TOKENS], device=model.device)
-            audio_header = tokenizer.encode("<|im_start|>user\n<|audio_bos|>", add_special_tokens=False, return_tensors="pt").to(model.device)
-            audio_footer = tokenizer.encode("<|audio_eos|>\n", add_special_tokens=False, return_tensors="pt").to(model.device)
+                audio_tokens = torch.tensor([[AUDIO_TOKEN_ID] * NUM_AUDIO_TOKENS], device=model.device)
+                audio_header = tokenizer.encode("<|im_start|>user\n<|audio_bos|>", add_special_tokens=False, return_tensors="pt").to(model.device)
+                audio_footer = tokenizer.encode("<|audio_eos|>\n", add_special_tokens=False, return_tensors="pt").to(model.device)
 
-            user_prefix_len = len(tokenizer.encode("<|im_start|>user\n", add_special_tokens=False))
-            vision_content = batch.input_ids[:, user_prefix_len:].to(model.device)
+                user_prefix_len = len(tokenizer.encode("<|im_start|>user\n", add_special_tokens=False))
+                vision_content = batch.input_ids[:, user_prefix_len:].to(model.device)
 
-            input_ids = torch.cat([audio_header, audio_tokens, audio_footer, vision_content], dim=1)
+                input_ids = torch.cat([audio_header, audio_tokens, audio_footer, vision_content], dim=1)
+            else:
+                # text_only: no audio tokens and no audio features -> standard Qwen2-VL layout
+                input_ids = batch.input_ids.to(model.device)
             attention_mask = torch.ones_like(input_ids)
 
             # Generate
@@ -176,7 +238,9 @@ def evaluate(args):
                 'short_answer': sample['short_answer'],
                 'predicted_answer': predicted,
                 'correct': int(is_correct),
-                'exact_match': int(is_correct)
+                'exact_match': int(is_correct),
+                'input_mode': args.input_mode,
+                'audio_source_id': audio_id if use_audio else None
             }
             results.append(result)
 
@@ -205,6 +269,7 @@ def evaluate(args):
     print("\n" + "="*80)
     print("EVALUATION RESULTS")
     print("="*80)
+    print(f"Input mode: {args.input_mode}")
     print(f"Total samples: {total}")
     print(f"Correct: {correct}")
     print(f"Accuracy: {accuracy:.2f}%")
@@ -244,6 +309,10 @@ def main():
                        help="Batch size (keep at 1 for memory)")
     parser.add_argument("--max_image_size", type=int, default=384,
                        help="Max image dimension")
+    parser.add_argument("--input_mode", type=str, default="audio_text",
+                       choices=["audio_text", "text_only", "audio_only", "mismatched_audio"],
+                       help="Ablation arm (default audio_text = training/deployment layout). "
+                            "See module docstring; audio_text is the sanity gate.")
 
     args = parser.parse_args()
     evaluate(args)
