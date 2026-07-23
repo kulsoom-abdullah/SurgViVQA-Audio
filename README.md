@@ -1,5 +1,5 @@
 # 🩺 SurgViVQA-Audio: Audio-Adapted Qwen2-VL for Surgical Video QA
-> **Goal:** Engineering a multimodal agent to “hear” live OR audio (no ASR) and “see” surgical video for real-time QA.
+> **Goal:** Engineering a multimodal agent to “hear” live OR audio (no ASR) and “see” surgical video for surgical QA.
 > ⚠️ **Research prototype only — not for clinical use.**
 
 **Quick Links:** [🤗 Model Weights](https://huggingface.co/kulsoom-abdullah/surgvivqa-qwen7b-audio) | [📊 Data Distribution](docs/data_distribution.md) | [🎬 Streamlit Demo](#streamlit-demo) | [📈 Results](#results)
@@ -17,15 +17,13 @@
 * **Method:** Trained on a small set (10 samples) until Loss converged quickly to 0.
 * **Result:** Confirmed the end-to-end gradient flow (Audio + Vision → Text) was functional before scaling the training.
 
-### 2. Bias Mitigation (Stratified Scaling)
+### 2. Stratified Splitting
 * **Challenge:** Medical data is often imbalanced. While this set, SurgViVQA, was not severely skewed globally (61% Yes/No), critical categories like `tool_identification` represent only **3.7%** of the data. Random splitting risked leaving these out of the validation set.
 * **Solution:** Implemented **Question-Type Stratification** ([`scripts/create_multivideo_split.py`](scripts/create_multivideo_split.py)) to ensure every category (e.g., Tools, Motion, Lesion) was represented in the 15% Eval split.
-* **Result:** Achieved **84% accuracy** on safety-critical classes like `occlusion_check`.
 
 ### 3. Generalization (Held-Out Video)
 * **Challenge:** Prevent the model from overfitting to procedure-specific visual patterns.
 * **Method:** Evaluated on a completely unseen video (`002-004`) to test generalization to an unseen video.
-* **Result:** **63.4% Accuracy** on held-out test set (+17.4 points over [zero-shot baseline](baselines/baseline2_audio_image.py)).
 
 ### 4. Deployment (Streamlit Demo)
 * **Output:** Built an interactive app ([`src/app.py`](src/app.py)) with "Flipbook" animation to visualize the sampled frame sequence for clinicians.
@@ -70,21 +68,7 @@ I used a portion of the [**SurgViVQA**](https://github.com/madratak/SurgViVQA/) 
 <a id="results"></a>
 ## 📈 Results
 
-### Performance Summary
-
-**Best Checkpoint:** `checkpoint-1000` (epoch 3.48, selected by early stopping)
-
-| Metric | Eval Set | Test Set (Held-Out) |
-|--------|----------|---------------------|
-| **Overall Accuracy** | 67.84% | **63.4%** (634/1000) |
-| **Zero-Shot Baselines** | - | 44-46% (text or audio) |
-| **Improvement** | - | **+17.4 points** |
-
-**Baseline Comparison:**
-I compared an end-to-end audio-adapted model (raw audio → Whisper encoder embeddings; no decoding → projector → Qwen2-VL) against a traditional two-stage pipeline (Whisper ASR text → Qwen2-VL).
-* **Accuracy:** Fine-tuning the audio-adapted model improved accuracy from ~46% (zero-shot) to **63.4%**, matching the performance of text-based approaches while using raw audio.
-* **Speed:** 2.5× faster end-to-end by skipping intermediate transcription (**0.9s vs 2.3s**, batch=1), equivalent to **1.07 vs 0.43 samples/sec** under the same setup.
-* 📄 **Baseline scripts:** [`baseline1_text_image.py`](baselines/baseline1_text_image.py) | [`baseline2_audio_image.py`](baselines/baseline2_audio_image.py) | [`baseline3_asr_pipeline.py`](baselines/baseline3_asr_pipeline.py)
+> **⚠️ Evaluation under revision (July 2026).** Quantitative results for the audio-adapted model are being re-measured under a revised evaluation harness and are temporarily removed from this page. The cross-generation vision comparison below is computed from committed prediction files (`results/*.jsonl`) and is unaffected.
 
 ---
 
@@ -107,71 +91,15 @@ Prediction files: `results/qwen2_zeroshot_test.jsonl`, `results/qwen25_zeroshot_
 
 ---
 
-### Performance by Question Type (Held-Out Test Set - Procedure 002-004)
-
-**Perfect Scores (100%):**
-| Question Type | Accuracy | Reason |
-|---------------|----------|--------|
-| blue_dye_presence | 100.0% (50/50) | Binary question, clear visual signal |
-| endoscope_visibility | 100.0% (50/50) | Unambiguous visibility assessment |
-| lesion_size_range | 100.0% (50/50) | All test samples <5mm (no variety) |
-| lighting_mode | 100.0% (50/50) | All test samples NBI mode (no variety) |
-| tool_catheter_check | 100.0% (50/50) | Binary tool presence |
-
-**Strong Performance (>75%):**
-| Question Type | Accuracy | Notes |
-|---------------|----------|-------|
-| scope_outside | 98.0% (49/50) | Clear visual boundary detection |
-| occlusion_check | 84.0% (42/50) | Safety-critical, well-represented in training |
-
-**Moderate Performance (50-75%):**
-| Question Type | Accuracy | Challenge |
-|---------------|----------|-----------|
-| tool_identification | 66.0% (33/50) | All test samples: forceps only (limited variety) |
-| nbi_status | 56.0% (28/50) | Binary lighting mode detection |
-| scope_forward_motion | 54.0% (27/50) | Temporal reasoning across 8 frames |
-| mucosa_visibility | 52.0% (26/50) | Subjective visibility assessment |
-| scope_backward_motion | 50.0% (25/50) | Motion direction (temporal) |
-| scope_motion | 50.0% (25/50) | Binary motion detection |
-
-**Challenging Questions (<50%):**
-| Question Type | Accuracy | Root Cause |
-|---------------|----------|------------|
-| flush_action | 48.0% (24/50) | Subtle fluid motion detection |
-| scope_motion_type | 46.0% (23/50) | 2-way classification (advancing/withdrawing) |
-| lesion_histology_extended | 46.0% (23/50) | All test: hyperplastic (no variety) |
-| fluid_occlusion_level | 44.0% (22/50) | 2-way classification (absent/complete) |
-| lesion_site | 34.0% (17/50) | 2-way in test (sigma/rectum), limited training |
-
-**Hardest Questions (<25%):**
-| Question Type | Accuracy | Analysis |
-|---------------|----------|----------|
-| **lesion_motion_direction** | **20.0% (10/50)** | mode collapse onto learned prior (see Root Causes) |
-| **lesion_screen_position** | **20.0% (10/50)** | 4-way spatial reasoning (quadrant detection) |
-
----
-
 ### Key Insights
-
-✅ **What the model does well:**
-- Binary Yes/No questions with clear visual signals (98-100%)
-- Safety-critical assessments like occlusion detection (84%)
-- Some 100% scores are artifacts of single-class test slices.
-
-⚠️ **Where the model struggles:**
-- **Multi-way classification** (5-way motion: 20%, 4-way position: 20%)
-- **Temporal reasoning** across 8 frames (motion questions: 20-54%)
-- **Fine-grained spatial reasoning** (lesion position quadrants: 20%)
 
 **Root causes:**
 1. **Mode collapse, not weak temporal reasoning:** Error analysis ([`src/analyze_errors.py`](src/analyze_errors.py)) of the fine-tuned Qwen 3.0 run ([`results/qwen3_finetuned_test.jsonl`](results/qwen3_finetuned_test.jsonl)) shows the model defaults to a learned prior on `lesion_motion_direction`: it answers only "downward" (38/50) or "upward" (12/50) and never predicts left, right, or stable — against a balanced 10-per-class ground truth. Every "correct" answer (9 down + 2 up = 22%) is a coincidental overlap between that prior and the label, not motion reading. The Qwen 2.0→2.5→3.0 ablation (16–22%, zero-shot and fine-tuned) rules out model capacity as the cause.
-2. **Motion signal is not reliably present in the input:** The dataset samples 8 frames (stride 4, ~1.1s at 25 fps) from a fixed position for every question, regardless of where the labeled motion occurs in the source video — visual audit of failure cases (April 2026) found that for many motion-direction questions the labeled motion is not contained in the 8 sampled frames at all. The pipeline also feeds frames as independent images (`images=`, not the `videos=` pathway), so even motion that is present receives no temporal encoding.
+2. **Motion signal is not reliably present in the input:** The dataset samples 8 frames (stride 4, ~1.1s at 25 fps) from a fixed position for every question, regardless of where the labeled motion occurs in the source video — visual audit of failure cases (April 2026) found that for many motion-direction questions the labeled motion is not contained in the 8 sampled frames at all. The pipeline also feeds frames as independent images (`images=`, not the `videos=` pathway). Frame order is preserved through position encoding, but each frame is encoded separately — without the temporal patch merging that the video pathway applies across adjacent frames.
 3. **Resolution constraint:** 384px may be too low for precise spatial localization (affects `tool_identification`, `lesion_screen_position`)
-4. **Limited test variety:** Some perfect scores (100%) are due to single-class test sets (all <5mm, all NBI, all forceps)
+4. **Limited test variety:** Several test-set categories are single-class slices (all <5mm, all NBI, all forceps), which inflates their scores regardless of model quality
 
-**Hypothesized fix (future work — not yet run):** Targeted frame resampling — re-extracting frames aligned to where the labeled motion actually occurs — is the precondition. Switching to the `videos=` pathway (M-RoPE temporal encoding) alone would not fix this: temporal encoding cannot recover motion that is absent from the frames. Neither change has been run, so the fix is hypothesized, not demonstrated.
-
-📊 **Full evaluation:** Run evaluation script to generate detailed per-sample results
+**Hypothesized fix (future work — not yet run):** Targeted frame resampling — re-extracting frames aligned to where the labeled motion actually occurs — is the precondition. Switching to the `videos=` pathway (temporal patch merging) alone would not fix this: temporal encoding cannot recover motion that is absent from the frames. Neither change has been run, so the fix is hypothesized, not demonstrated.
 
 ---
 
@@ -207,7 +135,7 @@ This is **not** text generation quality evaluation—we only care that the model
 
 ## 🏗️ Architecture
 
-The architecture bypasses the standard ASR (Speech-to-Text) pipeline to reduce latency and error propagation, allowing the model to process raw audio embeddings directly alongside visual tokens.
+The architecture bypasses the standard ASR (Speech-to-Text) pipeline to avoid error propagation, allowing the model to process raw audio embeddings directly alongside visual tokens.
 
 ```mermaid
 graph LR
@@ -284,18 +212,11 @@ pip install -r requirements.txt
 <a id="streamlit-demo"></a>
 ### 🎬 2. Streamlit Demo
 
-Running on 1x RTX 4090. Latency: ~1.2s per query.
+Running on 1x RTX 4090.
 
 [![Watch the Demo](docs/demo_screenshot.png)](https://www.loom.com/share/e6259484ed0f4ad2aac584860c0d32f0)
 
-> *Click above for the full technical walkthrough (4:40). Use the chapters below to jump to specific tests:*
-
-**⏱️ Video Chapters:**
-* [**0:00** - Architecture: Why Direct Audio Adaptation? (2.5x Speedup)](https://www.loom.com/share/e6259484ed0f4ad2aac584860c0d32f0?t=0)
-* [**0:32** - Safety Test 1: Occlusion Check (False Positive Analysis)](https://www.loom.com/share/e6259484ed0f4ad2aac584860c0d32f0?t=32)
-* [**1:46** - Safety Test 2: Tool/Catheter Detection (Success)](https://www.loom.com/share/e6259484ed0f4ad2aac584860c0d32f0?t=106)
-* [**2:29** - The Challenge: Scope Motion & Temporal Reasoning](https://www.loom.com/share/e6259484ed0f4ad2aac584860c0d32f0?t=149)
-* [**3:54** - Precision Test: Lighting Mode & NBI (100% Reliability)](https://www.loom.com/share/e6259484ed0f4ad2aac584860c0d32f0?t=234)
+> *Demo video — metrics under revision.*
 
 To launch the interactive surgical VQA assistant:
 
@@ -307,7 +228,7 @@ streamlit run src/app.py --server.port 8501 --server.address 0.0.0.0
 - 🎤 Record audio questions via microphone
 - 🎞️ View 8-frame surgical sequences in grid layout
 - ▶️ Flipbook animation (2 FPS) to visualize motion
-- 🎯 Real-time model inference with ground truth comparison
+- 🎯 Live model inference with ground truth comparison
 - 📊 Question type filtering (20 categories)
 - 📈 Performance stats display in sidebar
 
@@ -351,6 +272,8 @@ python scripts/download_sample_frames.py --verify --output_dir dataset/frames
 ```
 
 **Purpose:** Confirm whether 8-frame sequences contain sufficient visual signal for each question type — foundation for documenting SFT failure modes before GRPO.
+
+> **⚠️ Under revision (July 2026):** the viewer can display a sample alongside another sample's question and answer. Treat its output as unverified.
 
 ---
 
@@ -435,12 +358,12 @@ SurgViVQA-Audio/
 ## 🔮 Future Work
 
 ### Immediate Improvements
-* **Higher Resolution:** Scale from 384px → 768px to improve `tool_identification` (currently 66%, limited by resolution)
+* **Higher Resolution:** Scale from 384px → 768px to improve `tool_identification` (limited by resolution)
 * **Targeted Frame Resampling:** Re-extract frames from the source videos aligned to where the labeled motion actually occurs, rather than taking more frames from the same fixed ~1-second clip. The current stride-4 design means 8→16 frames would still cover the same fixed window — frame selection is the constraint, not the frame count. Not yet run; the expected gain is hypothesized, not demonstrated.
-* **Model Upgrade:** Test video-native VLMs (e.g., Qwen2.5-VL, MedGemma) for categories where visual signal IS present but the model still underperforms (`tool_identification`, `occlusion_check`).
+* **Model Upgrade:** Test video-native VLMs (e.g., Qwen2.5-VL, MedGemma) for categories where visual signal IS present but the model still underperforms (`tool_identification`).
 
 ### Architectural Explorations
-* **Video-Native Backbone:** Replace frame-by-frame `images=` processing with true video encoding (`videos=` pathway, M-RoPE). On its own this would not fix the motion categories — frames must first contain readable motion (see Targeted Frame Resampling) — and it has not been run.
+* **Video-Native Backbone:** Replace frame-by-frame `images=` processing with true video encoding (`videos=` pathway, temporal patch merging). On its own this would not fix the motion categories — frames must first contain readable motion (see Targeted Frame Resampling) — and it has not been run.
 * **Attention Optimization:** Migrate from SDPA to FlashAttention-2 + Unsloth for 2-3x speedup
 * **Audio Variations:** Test different TTS voices/speeds for robustness (currently using single voice)
 
