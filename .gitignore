@@ -85,3 +85,9 @@ MENTOR_UPDATE.md
 RESEARCH_CONSULTATION_PROMPT.md
 Claude.md
 !/data/audio/_canonical/*/*.mp3
+!results/baseline/
+results/baseline/*
+!results/baseline/*.txt
+!results/baseline/*.json
+!results/baseline/*.jsonl
+!results/baseline/*.patch

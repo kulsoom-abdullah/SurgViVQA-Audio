@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "src/evaluate_checkpoint.py",
+    "--no_adapter",
+    "--input_mode",
+    "text_only",
+    "--eval_data_path",
+    "data/test_multivideo.jsonl",
+    "--frames_dir",
+    "data/frames",
+    "--audio_dir",
+    "data/audio/test",
+    "--output_file",
+    "results/baseline/cell1_base_text.jsonl"
+  ],
+  "audio_dir": "/workspace/surgivqa/data/audio/test",
+  "eval_data_path": "/workspace/surgivqa/data/test_multivideo.jsonl",
+  "audio_required": 0,
+  "audio_found": 0,
+  "coverage_fraction": null,
+  "input_mode": "text_only",
+  "allow_missing_audio": false,
+  "checkpoint_path": null,
+  "key_scheme": "K2",
+  "adapter_loaded": false,
+  "git_sha": "GIT_ERROR(128): fatal: not a git repository (or any parent up to mount point /)\nStopping at filesystem boundary (GIT_DISCOVERY_ACROSS_FILESYSTEM not set).",
+  "git_ref": "GIT_ERROR(128): fatal: not a git repository (or any parent up to mount point /)\nStopping at filesystem boundary (GIT_DISCOVERY_ACROSS_FILESYSTEM not set).",
+  "git_dirty": "GIT_ERROR(128): fatal: not a git repository (or any parent up to mount point /)\nStopping at filesystem boundary (GIT_DISCOVERY_ACROSS_FILESYSTEM not set).",
+  "utc_timestamp": "2026-07-26T19:54:25.616593+00:00",
+  "total": 1000,
+  "correct": 366,
+  "accuracy": 36.6
+}
