@@ -13,10 +13,10 @@ dist/
 build/
 
 # Data (too large for Git - will sync from R2/network volume)
-audio/
+
 dataset/
 data/frames/
-data/audio/
+/data/audio/*/*.mp3
 *.mp3
 *.wav
 *.mp4
@@ -84,3 +84,4 @@ MEDGEMMA_COMPETITION_ASSESSMENT.md
 MENTOR_UPDATE.md
 RESEARCH_CONSULTATION_PROMPT.md
 Claude.md
+!/data/audio/_canonical/*/*.mp3

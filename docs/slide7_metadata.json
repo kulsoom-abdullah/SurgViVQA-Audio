@@ -1,0 +1,90 @@
+{
+  "slide": "Slide 7 - Frame Sampling Failure: lesion_motion_direction",
+  "output_png": "/Users/kulsoom/workspace/learning/SurgViVQA-Audio/docs/slide7_frame_sampling.png",
+  "model_context": {
+    "hero_model": "Qwen2-VL-7B + LoRA audio graft (kulsoom-abdullah/Qwen2-Audio-7B-Transcription + checkpoint-1000)",
+    "hero_overall_accuracy": "63.4%",
+    "hero_motion_dir_accuracy": "20% (10/50)",
+    "predictions_file_used": "results/qwen3_finetuned_test.jsonl",
+    "proxy_overall_accuracy": "74.0%",
+    "proxy_motion_dir_accuracy": "22% (11/50)",
+    "note": "Hero-model predictions not present on disk. qwen3_finetuned used as proxy -- both achieve ~random-guess performance on lesion_motion_direction (5-class, 20% baseline). Frames and question IDs are identical."
+  },
+  "wrong_example": {
+    "question_id": "qa_003704",
+    "video_id": "002-004",
+    "question": "In which direction does the lesion drift over the frames?",
+    "ground_truth": "stable (no movement)",
+    "model_prediction": "downward",
+    "correct": false,
+    "frame_ids": [
+      "002-004_28525",
+      "002-004_28529",
+      "002-004_28533",
+      "002-004_28537",
+      "002-004_28541",
+      "002-004_28545",
+      "002-004_28549",
+      "002-004_28553"
+    ],
+    "frame_numbers": [
+      28525,
+      28529,
+      28533,
+      28537,
+      28541,
+      28545,
+      28549,
+      28553
+    ],
+    "frame_step": 4,
+    "clip_span_frames": 28,
+    "clip_duration_sec": 1.12,
+    "frame_interval_sec": 0.16,
+    "video_fps": 25,
+    "video_total_frames": 31818,
+    "video_duration_min": 21.2
+  },
+  "right_example": {
+    "question_id": "qa_003722",
+    "video_id": "002-004",
+    "question": "In which direction does the lesion drift over the frames?",
+    "ground_truth": "downward",
+    "model_prediction": "downward",
+    "correct": true,
+    "frame_ids": [
+      "002-004_28560",
+      "002-004_28564",
+      "002-004_28568",
+      "002-004_28572",
+      "002-004_28576",
+      "002-004_28580",
+      "002-004_28584",
+      "002-004_28588"
+    ],
+    "frame_numbers": [
+      28560,
+      28564,
+      28568,
+      28572,
+      28576,
+      28580,
+      28584,
+      28588
+    ],
+    "frame_step": 4,
+    "clip_span_frames": 28,
+    "clip_duration_sec": 1.12,
+    "frame_interval_sec": 0.16,
+    "video_fps": 25,
+    "video_total_frames": 31818,
+    "video_duration_min": 21.2
+  },
+  "qa_notes": {
+    "consecutive_clips": "Wrong example ends at frame 28553; right example starts at 28560. Same post-resection lesion site.",
+    "mode_collapse": "Model only ever predicts 'downward' or 'upward' -- never 'left', 'right', or 'stable'. Output distribution: downward=38/50 (76%), upward=12/50 (24%). Confusion: GT=stable: 5 downward + 5 upward (0% correct); GT=left/right: 16 downward + 4 upward (0% correct); GT=upward: 2 upward (20% correct); GT=downward: 9 downward (90% correct). Overall 22/50 = 22% correct -- barely above 20% random-guess baseline.",
+    "why_hard": "Each clip = 1.12s. Motion is subtle. No cross-frame temporal attention -- model sees 8 independent frames.",
+    "dataset": "All 50 lesion_motion_direction test samples from video 002-004 (83M, Olympus, 25fps, BBPS=9, 3 lesions, 21-min procedure).",
+    "insight_for_slide": "These two clips are CONSECUTIVE (wrong ends at #28553, right starts at #28560). The model gives the SAME answer ('downward') for both. When GT happens to be 'downward', it looks correct. This is not temporal reasoning -- it is mode collapse on a learned prior."
+  }
+}
