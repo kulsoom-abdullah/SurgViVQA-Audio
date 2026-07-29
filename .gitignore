@@ -13,10 +13,10 @@ dist/
 build/
 
 # Data (too large for Git - will sync from R2/network volume)
-audio/
+
 dataset/
 data/frames/
-data/audio/
+/data/audio/*/*.mp3
 *.mp3
 *.wav
 *.mp4
@@ -84,3 +84,29 @@ MEDGEMMA_COMPETITION_ASSESSMENT.md
 MENTOR_UPDATE.md
 RESEARCH_CONSULTATION_PROMPT.md
 Claude.md
+!/data/audio/_canonical/*/*.mp3
+!results/baseline/
+results/baseline/*
+!results/baseline/*.txt
+!results/baseline/*.json
+!results/baseline/*.jsonl
+!results/baseline/*.patch
+
+# Cross-model capacity control and latency benchmark: predictions + manifests
+# are the evidence the results docs cite, so they are tracked.
+!results/capacity/
+results/capacity/*
+!results/capacity/*.json
+!results/capacity/*.jsonl
+!results/bench/
+results/bench/*
+!results/bench/*.json
+!results/bench/*.jsonl
+
+# Cell 3 (fine-tuned, audio-only) predictions, run manifest, and training log.
+# train.log is the only record of the loss curve -- the run used --report_to none.
+!results/cell3/
+results/cell3/*
+!results/cell3/*.json
+!results/cell3/*.jsonl
+!results/cell3/*.log

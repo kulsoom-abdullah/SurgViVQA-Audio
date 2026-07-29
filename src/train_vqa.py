@@ -5,15 +5,20 @@ Train Audio-Grafted Qwen2-VL for Surgical VQA (QLoRA)
 - SDPA attention (compatible with quantized weights)
 - W&B tracking enabled
 
-Launch command for full training (50-sample overfit test):
+Questions are delivered as AUDIO ONLY by default: the prompt carries the bare
+instruction and the question itself arrives as speech. Pass --include_question_text
+to restore the old behaviour, which also delivered the question as text and made
+the audio arm uninterpretable.
+
+Launch command for full multivideo training:
 python src/train_vqa.py \
-    --output_dir ./checkpoints/surgical_vqa_50 \
-    --run_name "surgical-vqa-50-samples" \
-    --train_data_path test_set/in_002-001.jsonl \
-    --eval_data_path test_set/out_002-001.jsonl \
-    --frames_dir data/frames \
-    --audio_dir data/audio/in_002-001 \
-    --eval_audio_dir data/audio/out_002-001 \
+    --output_dir ./checkpoints/surgical_vqa_multivideo \
+    --run_name "surgical-vqa-multivideo-audio-only" \
+    --train_data_path data/train_multivideo.jsonl \
+    --eval_data_path data/eval_multivideo.jsonl \
+    --frames_dir dataset/frames \
+    --audio_dir data/audio/train \
+    --eval_audio_dir data/audio/eval \
     --per_device_train_batch_size 1 \
     --gradient_accumulation_steps 4 \
     --per_device_eval_batch_size 1 \
@@ -83,6 +88,18 @@ warnings.filterwarnings(
 AUDIO_ADAPTED_MODEL_ID = "kulsoom-abdullah/Qwen2-Audio-7B-Transcription"
 MAX_LENGTH = 1024
 
+# Prompt variants. Byte-identical to evaluate_checkpoint.py so train and eval
+# cannot silently disagree about what the model was asked.
+PROMPT_AUDIO_ONLY = "Answer the question concisely based on the visual and audio evidence."
+PROMPT_WITH_QUESTION = "User Question: {question}\nAnswer the question concisely based on the visual and audio evidence."
+
+def k2_key(row):
+    """Audio filename key. The bare `id` is NOT unique — it repeats across videos
+    and splits with different questions attached, so a flat {id}.mp3 lookup can
+    silently return a different question's audio. K2 is collision-free across all
+    3700 corpus rows."""
+    return f"{row['video_id']}_{row['id']}_{row['question_type']}"
+
 @dataclass
 class ModelArguments:
     model_name_or_path: Optional[str] = field(default=AUDIO_ADAPTED_MODEL_ID)
@@ -94,6 +111,12 @@ class DataArguments:
     frames_dir: str = field(default=None)
     audio_dir: str = field(default=None)
     eval_audio_dir: str = field(default=None)
+    include_question_text: bool = field(
+        default=False,
+        metadata={"help": "Put the question in the prompt as TEXT as well as audio. "
+                          "Off by default: including it reproduces the original "
+                          "text-leak confound that made the audio arm uninterpretable."},
+    )
 
 @dataclass
 class TrainingArguments(transformers.TrainingArguments):
@@ -105,7 +128,8 @@ class TrainingArguments(transformers.TrainingArguments):
 
 class SurgicalVQADataset(Dataset):
     def __init__(self, data_path, frames_dir, audio_dir, processor, tokenizer, feature_extractor,
-                 max_eval_frames=None, is_eval=False):
+                 max_eval_frames=None, is_eval=False, include_question_text=False,
+                 split_name="train"):
         self.data = [json.loads(line) for line in open(data_path, 'r')]
         self.frames_dir = frames_dir
         self.audio_dir = audio_dir
@@ -116,6 +140,71 @@ class SurgicalVQADataset(Dataset):
         self.num_audio_tokens = 1500
         self.max_eval_frames = max_eval_frames
         self.is_eval = is_eval
+        self.include_question_text = include_question_text
+        self.split_name = split_name
+        self._preflight()
+
+    def _preflight(self):
+        """Fail at construction rather than mid-epoch.
+
+        Every input this dataset will ever ask for is resolved up front. A file
+        discovered missing on step 4000 wastes the whole run, and under
+        audio-only questions a missing .mp3 means the row carries NO question at
+        all — it would train on nothing. There is deliberately no bypass flag.
+        """
+        n = len(self.data)
+
+        by_key = {}
+        for idx, row in enumerate(self.data):
+            by_key.setdefault(k2_key(row), []).append(idx)
+        collisions = {k: v for k, v in by_key.items() if len(v) > 1}
+        if collisions:
+            detail = "\n".join(f"    {k} <- rows {v}" for k, v in sorted(collisions.items())[:20])
+            raise RuntimeError(
+                f"DATASET {self.split_name}: K2 key is not unique — "
+                f"{len(collisions)} collision(s); one .mp3 would serve two rows:\n{detail}"
+            )
+
+        missing_audio = []
+        for row in self.data:
+            path = Path(self.audio_dir) / f"{k2_key(row)}.mp3"
+            if not path.exists():
+                missing_audio.append(str(path))
+
+        frame_slots = 0
+        missing_frames = []
+        for row in self.data:
+            for frame_name in row['frames']:
+                frame_slots += 1
+                # Resolution MUST match __getitem__ below, both branches — a gate that
+                # resolves differently is checking something the loader will not do.
+                if '_' in frame_name:
+                    vid_id = frame_name.rsplit('_', 1)[0]
+                else:
+                    vid_id = "unknown"
+                path = Path(self.frames_dir) / vid_id / f"{frame_name}.jpg"
+                if not path.exists():
+                    frame_num = frame_name.rsplit('_', 1)[1] if '_' in frame_name else frame_name
+                    path = Path(self.frames_dir) / vid_id / f"{frame_num}.jpg"
+                if not path.exists():
+                    missing_frames.append(str(path))
+
+        print(f"DATASET {self.split_name}: {n} rows, "
+              f"audio {n - len(missing_audio)}/{n}, "
+              f"frames {frame_slots - len(missing_frames)}/{frame_slots} row-slots")
+
+        if missing_audio or missing_frames:
+            lines = []
+            if missing_audio:
+                lines.append(f"  missing audio: {len(missing_audio)} (first 5)")
+                lines += [f"    {p}" for p in missing_audio[:5]]
+            if missing_frames:
+                lines.append(f"  missing frames: {len(missing_frames)} (first 5)")
+                lines += [f"    {p}" for p in missing_frames[:5]]
+            raise RuntimeError(
+                f"DATASET {self.split_name}: inputs are not 100% resolvable — refusing to train.\n"
+                + "\n".join(lines)
+            )
 
     def _select_frames(self, frames):
         """Select subset of frames for eval to reduce memory"""
@@ -132,11 +221,13 @@ class SurgicalVQADataset(Dataset):
         sample = self.data[i]
 
         # 1. Load Audio
-        audio_path = Path(self.audio_dir) / f"{sample['id']}.mp3"
+        audio_path = Path(self.audio_dir) / f"{k2_key(sample)}.mp3"
         if not audio_path.exists():
-            y = torch.zeros(16000 * 2)
-        else:
-            y, _ = librosa.load(audio_path, sr=16000, mono=True)
+            # No silent-silence fallback. Under audio-only questions, 2s of zeros
+            # means the model is handed no question at all and the row trains on
+            # nothing — silently. The pre-flight should have caught this already.
+            raise FileNotFoundError(f"missing audio: {audio_path}")
+        y, _ = librosa.load(audio_path, sr=16000, mono=True)
 
         audio_inputs = self.feature_extractor(y, sampling_rate=16000, return_tensors="pt")
         input_features = audio_inputs.input_features.squeeze(0)
@@ -161,11 +252,17 @@ class SurgicalVQADataset(Dataset):
                     img.thumbnail((384, 384))
                 images.append(img)
             else:
+                # Unreachable: _preflight() refuses construction unless every frame
+                # resolves. Kept so a loader bug degrades rather than crashes.
                 images.append(Image.new('RGB', (224, 224), color='black'))
 
         # 3. Create Prompt
         content = [{"type": "image"} for _ in range(len(images))]
-        question_text = f"User Question: {sample['question']}\nAnswer the question concisely based on the visual and audio evidence."
+        if self.include_question_text:
+            question_text = PROMPT_WITH_QUESTION.format(question=sample['question'])
+        else:
+            # Audio-only: the question arrives ONLY as speech.
+            question_text = PROMPT_AUDIO_ONLY
         content.append({"type": "text", "text": question_text})
 
         conversation = [
@@ -253,6 +350,22 @@ def train():
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
+    # Startup banner — the prompt configuration decides whether the audio arm is
+    # interpretable at all, so it must be impossible to miss in the logs.
+    RED, RESET = "\033[91m", "\033[0m"
+    prompt_in_use = (PROMPT_WITH_QUESTION if data_args.include_question_text
+                     else PROMPT_AUDIO_ONLY)
+    print("=" * 80)
+    print(f"AUDIO-ONLY QUESTION MODE: {'NO' if data_args.include_question_text else 'YES'}")
+    print(f"  audio_dir      : {data_args.audio_dir}")
+    print(f"  eval_audio_dir : {data_args.eval_audio_dir}")
+    print(f"  frames_dir     : {data_args.frames_dir}")
+    print(f"  prompt         : {prompt_in_use!r}")
+    print("=" * 80)
+    if data_args.include_question_text:
+        print(f"{RED}WARNING: question text included in prompt - this reproduces "
+              f"the original text-leak confound{RESET}")
+
     # Load Quantized Model with SDPA (QLoRA: 4-bit base + bf16 LoRA)
     print("⏳ Loading 4-bit quantized model with SDPA attention...")
     from transformers import BitsAndBytesConfig
@@ -322,7 +435,9 @@ def train():
         data_args.audio_dir,
         processor, tokenizer, feature_extractor,
         max_eval_frames=None,  # Train uses all 8 frames
-        is_eval=False
+        is_eval=False,
+        include_question_text=data_args.include_question_text,
+        split_name="train"
     )
 
     eval_dataset = None
@@ -337,7 +452,9 @@ def train():
             eval_audio_path,
             processor, tokenizer, feature_extractor,
             max_eval_frames=None,  # Eval uses all 8 frames (same as training)
-            is_eval=True
+            is_eval=True,
+            include_question_text=data_args.include_question_text,
+            split_name="eval"
         )
 
     # Setup callbacks

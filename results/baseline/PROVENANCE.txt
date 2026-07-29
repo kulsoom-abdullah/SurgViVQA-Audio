@@ -1,0 +1,17 @@
+=== run: cell1/cell2 base baselines, 2026-07-26T20:16:14Z ===
+HEAD: 5fd72b70da90ac0955e9804d21ad7a5091af8f1e
+branch: analysis/audio-ablation-harness
+--- dirty files at run time ---
+ M src/evaluate_checkpoint.py
+?? data/voices/
+?? docs/slide7_frame_sampling.png
+?? docs/slide7_metadata.json
+?? src/frames/
+?? viewer/
+?? voices.txt
+--- sha256 ---
+ba820f52a8c88bfb5a181ebc3b3ae11090adae7c9c3db4fd7c9e96b9694547ec  src/evaluate_checkpoint.py
+feaef8f8698ec4d80049ad7fab34746e3c42106c2c7da191398bd55fdc243f46  data/test_multivideo.jsonl
+b9ae8e04440e0996f4a9ba37ec38b1400d07fdb0357c22ca324fd39ca45bf11a  transformers_fork.tar.gz
+--- pod ---
+RTX 4090, torch 2.4.1+cu124, transformers 4.47.0 (fork, editable), bitsandbytes 0.50.0, peft 0.19.1

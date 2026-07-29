@@ -68,38 +68,108 @@ I used a portion of the [**SurgViVQA**](https://github.com/madratak/SurgViVQA/) 
 <a id="results"></a>
 ## 📈 Results
 
-> **⚠️ Evaluation under revision (July 2026).** Quantitative results for the audio-adapted model are being re-measured under a revised evaluation harness and are temporarily removed from this page. The cross-generation vision comparison below is computed from committed prediction files (`results/*.jsonl`) and is unaffected.
+The model answers questions about surgical video from **spoken audio only** — no question
+text reaches the model at any point. Fine-tuning raised audio-only accuracy from **10.7% to
+57.1%** on 1,000 held-out samples from a patient absent from training.
 
----
+That headline number is close to meaningless on its own, and the rest of this section is
+about why.
 
-### Baseline Comparison Across Qwen Generations (Text + Vision, No Audio)
+### The benchmark has a floor, and it beats every model tested
 
-To isolate vision encoder capability across model generations, I evaluated Qwen 2.0, 2.5, and 3.0 using text-only queries on the same held-out test set. Audio was intentionally excluded: multimodal projectors are architecturally specific to each model's hidden dimension, so retraining the audio adapter per generation would conflate adapter quality with encoder quality. Text + vision gives a direct apples-to-apples comparison.
+Seven of 20 question types have a single gold answer across all 50 of their test rows
+(`blue_dye_presence`, `endoscope_visibility`, `lesion_histology_extended`,
+`lesion_size_range`, `lighting_mode`, `tool_catheter_check`, `tool_identification`). For
+those **350 rows — 35% of the test set — a constant string scores 100%** and no model can
+be distinguished from a lookup table.
 
-| Model | Zero-Shot Accuracy | Primary Gain |
+A system that identifies which of the 20 questions was asked and emits that type's most
+common answer, using no video at all, scores:
+
+| baseline | full 1,000 | discriminative 650 |
 |---|---|---|
-| Qwen 2.0-VL-7B | 36.0% | Baseline |
-| Qwen 2.5-VL-7B | 39.4% | Marginal (+3.4%) |
-| **Qwen 3.0-VL-8B** | **54.1%** | Step change in texture/lighting recognition (+14.7%) |
-| Qwen 3.0-VL-8B (SFT) | **74.0%** | Fine-tuning on multi-video train set |
+| majority answer per question type | **64.8%** | **45.8%** |
 
-Qwen 2.5's marginal gain made it a poor SFT candidate; Qwen 3.0's jump identified it as the right foundation. The SFT experiment was run only on Qwen 3.0.
+**64.8% exceeds every system measured here, including this one at 57.1%.** Aggregate
+accuracy on this benchmark measures answer priors more than it measures vision. All
+comparisons below therefore use the **650 rows from the 13 question types with more than
+one answer class**, and report margin over the per-type floor.
 
-**Key finding:** Every generation stays at chance on `lesion_motion_direction` — Qwen 2.0/2.5/3.0 zero-shot and Qwen 3.0 fine-tuned score 16–22% against a 20% random baseline (5-way) — ruling out model capacity as the cause. The chance-level scores are mode collapse onto a learned prior, not weak-but-real motion reading (see Root Causes below). The bottleneck is the input: frames are sampled from a fixed position per question, so for many motion questions the labeled motion is not contained in the sampled frames at all, and no encoder improvement can recover signal that was never captured.
+### Capability is a function of question family, not of model
 
-Prediction files: `results/qwen2_zeroshot_test.jsonl`, `results/qwen25_zeroshot_test.jsonl`, `results/qwen3_zeroshot_test.jsonl`, `results/qwen3_finetuned_test.jsonl`
+Five systems on identical rows, frames, prompt, and grading rule. Stock models receive the
+question as text; this model receives it as audio. Margin over the constant-emitter floor:
 
----
+| question family | n | floor | **this model** (audio) | Qwen2-VL-7B | Qwen2.5-VL-7B | Qwen3-VL-8B | Qwen3-VL-32B |
+|---|---|---|---|---|---|---|---|
+| **A. Static scene state** | 300 | 50.0 | **+12.3** | +5.7 | +0.3 | +5.0 | **+17.3** |
+| **B. Screen-space position** | 50 | 26.0 | +0.0 | +8.0 | −4.0 | −4.0 | **+22.0** |
+| **C. Temporal / motion** | 250 | 44.0 | +0.4 | +2.4 | +2.4 | +4.8 | +4.8 |
+| **D. Anatomical / diagnostic** | 200 | 87.5 | −57.0 | −79.0 | −87.5 | −60.0 | −58.5 |
 
-### Key Insights
+Three findings, each supported by five independent systems spanning 7B→33B and two model
+generations:
 
-**Root causes:**
-1. **Mode collapse, not weak temporal reasoning:** Error analysis ([`src/analyze_errors.py`](src/analyze_errors.py)) of the fine-tuned Qwen 3.0 run ([`results/qwen3_finetuned_test.jsonl`](results/qwen3_finetuned_test.jsonl)) shows the model defaults to a learned prior on `lesion_motion_direction`: it answers only "downward" (38/50) or "upward" (12/50) and never predicts left, right, or stable — against a balanced 10-per-class ground truth. Every "correct" answer (9 down + 2 up = 22%) is a coincidental overlap between that prior and the label, not motion reading. The Qwen 2.0→2.5→3.0 ablation (16–22%, zero-shot and fine-tuned) rules out model capacity as the cause.
-2. **Motion signal is not reliably present in the input:** The dataset samples 8 frames (stride 4, ~1.1s at 25 fps) from a fixed position for every question, regardless of where the labeled motion occurs in the source video — visual audit of failure cases (April 2026) found that for many motion-direction questions the labeled motion is not contained in the 8 sampled frames at all. The pipeline also feeds frames as independent images (`images=`, not the `videos=` pathway). Frame order is preserved through position encoding, but each frame is encoded separately — without the temporal patch merging that the video pathway applies across adjacent frames.
-3. **Resolution constraint:** 384px may be too low for precise spatial localization (affects `tool_identification`, `lesion_screen_position`)
-4. **Limited test variety:** Several test-set categories are single-class slices (all <5mm, all NBI, all forceps), which inflates their scores regardless of model quality
+**Static scene state is where vision works.** Is NBI lighting on, is mucosa visible, is the
+view occluded, is the scope outside the patient. Every model clears the floor. This model
+clears it by more than three of the four stock models.
 
-**Hypothesized fix (future work — not yet run):** Targeted frame resampling — re-extracting frames aligned to where the labeled motion actually occurs — is the precondition. Switching to the `videos=` pathway (temporal patch merging) alone would not fix this: temporal encoding cannot recover motion that is absent from the frames. Neither change has been run, so the fix is hypothesized, not demonstrated.
+**Temporal reasoning is absent for everyone.** +0.4 to +4.8 across a 4.7× parameter range.
+`lesion_motion_direction` sits at 12–24% against a 20% floor for *every* system. Eight
+frames sampled at a fixed offset do not contain the labeled motion, and no amount of model
+recovers signal that was never captured.
+
+**Screen-space position is recoverable, and this model does not recover it.** Qwen3-VL-32B
+scores +22 over floor; this model sits at exactly the floor, emitting one constant string
+for all 50 rows. This is a capability gap, not a frame-sampling limit — and it is at the
+same 384px resolution.
+
+Full 20-type table, both grading rules, and the vocabulary-normalization audit are in
+[`docs/RESULTS.md`](docs/RESULTS.md).
+
+### The audio pathway works, and that is measured separately
+
+Before fine-tuning, given spoken audio and no question text, the base model
+reproduced the question it had heard on **488 of 1,000 rows** — and identified
+**the correct spoken question** out of the 20 in the corpus on 472 of those,
+**96.7% against a 5% chance rate** (permutation null across 200 shuffles: 4.9%).
+At a stricter matching threshold, 414 rows are identified at 100%.
+
+So audio comprehension is present before any task fine-tuning. What fine-tuning supplied is
+answer format and partial visual grounding, not the ability to hear the question.
+
+### Direct audio input is not faster than transcription
+
+Measured on matched hardware, weights, frames, and decoding budget (n=100, medians):
+
+| | ASR pipeline | direct audio |
+|---|---|---|
+| transcription | 73.3 ms | — |
+| prefill | 870.1 ms | 1270.1 ms |
+| decode per generated token | 62.0 ms | 62.0 ms |
+| **end to end** | **1677.5 ms** | **1895.6 ms** |
+
+**0.88× — direct audio is 13% slower.** The entire difference is prefill: the audio path
+carries 2,795 input tokens against 1,294, because the encoder emits a fixed 1,500 tokens
+for a 30-second window regardless of the actual utterance, which here runs 2.8–4.1 seconds.
+Skipping transcription saves 73 ms; paying for the fixed-length audio context costs 400 ms.
+
+The architectural case for direct audio therefore rests on eliminating
+transcription-error propagation and on joint representation of prosody and background
+sound — not on latency. Longer utterances would shift this, since transcription cost scales
+with speech length while the audio prefix does not; the crossover is estimated near 20–25
+seconds of speech and has not been measured.
+
+### What this project does not show
+
+- No advantage over an off-the-shelf 33B vision-language model on the discriminative subset
+  (49.5% vs 54.3%)
+- No temporal reasoning, by any model tested
+- Losses to stock models on `mucosa_visibility` (48% vs 64–80%) and `occlusion_check`
+  (50% vs 86–88%)
+- Output diversity of ~1–2 distinct strings per question type, against 33 for Qwen3-VL-32B —
+  most of this model's aggregate lead comes from having learned the correct constant for the
+  single-class types, not from visual discrimination
 
 ---
 
@@ -214,10 +284,6 @@ pip install -r requirements.txt
 
 Running on 1x RTX 4090.
 
-[![Watch the Demo](docs/demo_screenshot.png)](https://www.loom.com/share/e6259484ed0f4ad2aac584860c0d32f0)
-
-> *Demo video — metrics under revision.*
-
 To launch the interactive surgical VQA assistant:
 
 ```bash
@@ -319,7 +385,6 @@ SurgViVQA-Audio/
 │   ├── app.py                      # Streamlit Demo (Interactive inference)
 │   └── evaluate_checkpoint.py      # Standalone evaluation script
 ├── docs/
-│   ├── demo_screenshot.png        # for embedded video
 │   ├── train_loss.png             # W&B plot
 │   ├── eval_loss.png              # W&B plot
 │   ├── data_distribution.md       # detailed stats
@@ -357,15 +422,10 @@ SurgViVQA-Audio/
 
 ## 🔮 Future Work
 
-### Immediate Improvements
-* **Higher Resolution:** Scale from 384px → 768px to improve `tool_identification` (limited by resolution)
-* **Targeted Frame Resampling:** Re-extract frames from the source videos aligned to where the labeled motion actually occurs, rather than taking more frames from the same fixed ~1-second clip. The current stride-4 design means 8→16 frames would still cover the same fixed window — frame selection is the constraint, not the frame count. Not yet run; the expected gain is hypothesized, not demonstrated.
-* **Model Upgrade:** Test video-native VLMs (e.g., Qwen2.5-VL, MedGemma) for categories where visual signal IS present but the model still underperforms (`tool_identification`).
-
-### Architectural Explorations
-* **Video-Native Backbone:** Replace frame-by-frame `images=` processing with true video encoding (`videos=` pathway, temporal patch merging). On its own this would not fix the motion categories — frames must first contain readable motion (see Targeted Frame Resampling) — and it has not been run.
-* **Attention Optimization:** Migrate from SDPA to FlashAttention-2 + Unsloth for 2-3x speedup
-* **Audio Variations:** Test different TTS voices/speeds for robustness (currently using single voice)
+Ordered by expected value, with rationale and current evidence, in
+[`docs/RESULTS.md` §10](docs/RESULTS.md#10-future-work): targeted frame
+resampling, native video input, variable-length audio encoding, off-the-shelf
+omni-model comparison, acoustic robustness, and denser frame sampling.
 
 ---
 

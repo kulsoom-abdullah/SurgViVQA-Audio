@@ -1,0 +1,73 @@
+{
+  "results_file": "results/baseline/cell2_base_audio.jsonl",
+  "eval_data_path": "data/test_multivideo.jsonl",
+  "n_rows": 1000,
+  "n_distinct_questions": 20,
+  "chance_rate": 0.05,
+  "primary_threshold": 0.2,
+  "by_threshold": {
+    "0.20": {
+      "n_echo_like": 488,
+      "echo_like_rate": 0.488,
+      "n_correct_question": 472,
+      "precision": 0.9672131147540983
+    },
+    "0.35": {
+      "n_echo_like": 414,
+      "echo_like_rate": 0.414,
+      "n_correct_question": 414,
+      "precision": 1.0
+    },
+    "0.50": {
+      "n_echo_like": 402,
+      "echo_like_rate": 0.402,
+      "n_correct_question": 402,
+      "precision": 1.0
+    }
+  },
+  "control_below_threshold": {
+    "n": 512,
+    "precision": 0.11328125
+  },
+  "control_permutation_null": {
+    "n_permutations": 200,
+    "mean": 0.04881147540983607,
+    "max": 0.25614754098360654
+  },
+  "seed": 0,
+  "stopwords": [
+    "a",
+    "an",
+    "and",
+    "are",
+    "as",
+    "at",
+    "be",
+    "been",
+    "by",
+    "can",
+    "did",
+    "do",
+    "does",
+    "for",
+    "from",
+    "here",
+    "in",
+    "is",
+    "it",
+    "of",
+    "on",
+    "or",
+    "that",
+    "the",
+    "there",
+    "these",
+    "this",
+    "those",
+    "to",
+    "was",
+    "were",
+    "with",
+    "you"
+  ]
+}

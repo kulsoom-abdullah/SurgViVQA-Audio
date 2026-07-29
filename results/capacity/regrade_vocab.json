@@ -1,0 +1,892 @@
+{
+  "generated_utc": "2026-07-29T16:00:12.221515+00:00",
+  "source_files": {
+    "Qwen2-VL-7B": "results/capacity/qwen2-vl-7b.jsonl",
+    "Qwen2.5-VL-7B": "results/capacity/qwen2.5-vl-7b.jsonl",
+    "Qwen3-VL-8B": "results/capacity/qwen3-vl-8b.jsonl",
+    "Qwen3-VL-32B": "results/capacity/qwen3-vl-32b.jsonl",
+    "cell3-finetuned": "results/cell3/cell3_finetuned_audio.jsonl"
+  },
+  "note": "Re-grade only; original jsonl files unmodified.",
+  "columns": {
+    "strict": "original manifest rule",
+    "vocab": "strict + user vocab map + APPROVED [A] word-order reversal (symmetric)",
+    "vocab_plus_C": "vocab + [C] absent<-none/no fluid/no fluid visible/clear. SEPARATE, NOT primary."
+  },
+  "vocab_map": {
+    "upper-left": [
+      "top left",
+      "top-left",
+      "upper left"
+    ],
+    "upper-right": [
+      "top right",
+      "top-right",
+      "upper right"
+    ],
+    "lower-left": [
+      "bottom left",
+      "bottom-left",
+      "lower left"
+    ],
+    "lower-right": [
+      "bottom right",
+      "bottom-right",
+      "lower right"
+    ],
+    "sigma": [
+      "sigmoid"
+    ],
+    "<5": [
+      "less than 5",
+      "under 5",
+      "smaller than 5"
+    ]
+  },
+  "approved_A_word_order": {
+    "upper-left": [
+      "left upper",
+      "left-upper"
+    ],
+    "upper-right": [
+      "right upper",
+      "right-upper"
+    ],
+    "lower-left": [
+      "left lower",
+      "left-lower"
+    ],
+    "lower-right": [
+      "right lower",
+      "right-lower"
+    ]
+  },
+  "separate_C_map": {
+    "absent": [
+      "none",
+      "no fluid",
+      "no fluid visible",
+      "clear"
+    ]
+  },
+  "C_excluded_term": "minimal -- semantic loosening, deliberately not credited",
+  "rejected": {
+    "B_forceps_from_grasper": "domain judgement, not phrasing",
+    "D_lt5_from_numeric_ranges": "'10-20 mm' for gold '<5' is wrong, not a rephrasing"
+  },
+  "carve_out": {
+    "complete": [
+      "completely"
+    ],
+    "down": [
+      "downward"
+    ]
+  },
+  "discriminative_types": [
+    "fluid_occlusion_level",
+    "flush_action",
+    "lesion_motion_direction",
+    "lesion_screen_position",
+    "lesion_site",
+    "mucosa_visibility",
+    "nbi_status",
+    "occlusion_check",
+    "scope_backward_motion",
+    "scope_forward_motion",
+    "scope_motion",
+    "scope_motion_type",
+    "scope_outside"
+  ],
+  "degenerate_types": [
+    "blue_dye_presence",
+    "endoscope_visibility",
+    "lesion_histology_extended",
+    "lesion_size_range",
+    "lighting_mode",
+    "tool_catheter_check",
+    "tool_identification"
+  ],
+  "models": {
+    "Qwen2-VL-7B": {
+      "per_question_type": {
+        "blue_dye_presence": {
+          "n": 50,
+          "strict_pct": 56.00000000000001,
+          "vocab_pct": 56.00000000000001,
+          "vocab_plus_C_pct": 56.00000000000001,
+          "discriminative": false
+        },
+        "endoscope_visibility": {
+          "n": 50,
+          "strict_pct": 90.0,
+          "vocab_pct": 90.0,
+          "vocab_plus_C_pct": 90.0,
+          "discriminative": false
+        },
+        "fluid_occlusion_level": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 0.0,
+          "vocab_plus_C_pct": 0.0,
+          "discriminative": true
+        },
+        "flush_action": {
+          "n": 50,
+          "strict_pct": 52.0,
+          "vocab_pct": 52.0,
+          "vocab_plus_C_pct": 52.0,
+          "discriminative": true
+        },
+        "lesion_histology_extended": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 0.0,
+          "vocab_plus_C_pct": 0.0,
+          "discriminative": false
+        },
+        "lesion_motion_direction": {
+          "n": 50,
+          "strict_pct": 22.0,
+          "vocab_pct": 22.0,
+          "vocab_plus_C_pct": 22.0,
+          "discriminative": true
+        },
+        "lesion_screen_position": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 34.0,
+          "vocab_plus_C_pct": 34.0,
+          "discriminative": true
+        },
+        "lesion_site": {
+          "n": 50,
+          "strict_pct": 8.0,
+          "vocab_pct": 8.0,
+          "vocab_plus_C_pct": 8.0,
+          "discriminative": true
+        },
+        "lesion_size_range": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 0.0,
+          "vocab_plus_C_pct": 0.0,
+          "discriminative": false
+        },
+        "lighting_mode": {
+          "n": 50,
+          "strict_pct": 2.0,
+          "vocab_pct": 2.0,
+          "vocab_plus_C_pct": 2.0,
+          "discriminative": false
+        },
+        "mucosa_visibility": {
+          "n": 50,
+          "strict_pct": 72.0,
+          "vocab_pct": 72.0,
+          "vocab_plus_C_pct": 72.0,
+          "discriminative": true
+        },
+        "nbi_status": {
+          "n": 50,
+          "strict_pct": 50.0,
+          "vocab_pct": 50.0,
+          "vocab_plus_C_pct": 50.0,
+          "discriminative": true
+        },
+        "occlusion_check": {
+          "n": 50,
+          "strict_pct": 86.0,
+          "vocab_pct": 86.0,
+          "vocab_plus_C_pct": 86.0,
+          "discriminative": true
+        },
+        "scope_backward_motion": {
+          "n": 50,
+          "strict_pct": 57.99999999999999,
+          "vocab_pct": 57.99999999999999,
+          "vocab_plus_C_pct": 57.99999999999999,
+          "discriminative": true
+        },
+        "scope_forward_motion": {
+          "n": 50,
+          "strict_pct": 50.0,
+          "vocab_pct": 50.0,
+          "vocab_plus_C_pct": 50.0,
+          "discriminative": true
+        },
+        "scope_motion": {
+          "n": 50,
+          "strict_pct": 52.0,
+          "vocab_pct": 52.0,
+          "vocab_plus_C_pct": 52.0,
+          "discriminative": true
+        },
+        "scope_motion_type": {
+          "n": 50,
+          "strict_pct": 50.0,
+          "vocab_pct": 50.0,
+          "vocab_plus_C_pct": 50.0,
+          "discriminative": true
+        },
+        "scope_outside": {
+          "n": 50,
+          "strict_pct": 74.0,
+          "vocab_pct": 74.0,
+          "vocab_plus_C_pct": 74.0,
+          "discriminative": true
+        },
+        "tool_catheter_check": {
+          "n": 50,
+          "strict_pct": 62.0,
+          "vocab_pct": 62.0,
+          "vocab_plus_C_pct": 62.0,
+          "discriminative": false
+        },
+        "tool_identification": {
+          "n": 50,
+          "strict_pct": 26.0,
+          "vocab_pct": 26.0,
+          "vocab_plus_C_pct": 26.0,
+          "discriminative": false
+        }
+      },
+      "overall_1000": {
+        "n": 1000,
+        "strict_pct": 40.5,
+        "vocab_pct": 42.199999999999996,
+        "vocab_plus_C_pct": 42.199999999999996
+      },
+      "discriminative_650": {
+        "n": 650,
+        "strict_pct": 44.15384615384615,
+        "vocab_pct": 46.76923076923077,
+        "vocab_plus_C_pct": 46.76923076923077
+      }
+    },
+    "Qwen2.5-VL-7B": {
+      "per_question_type": {
+        "blue_dye_presence": {
+          "n": 50,
+          "strict_pct": 84.0,
+          "vocab_pct": 84.0,
+          "vocab_plus_C_pct": 84.0,
+          "discriminative": false
+        },
+        "endoscope_visibility": {
+          "n": 50,
+          "strict_pct": 100.0,
+          "vocab_pct": 100.0,
+          "vocab_plus_C_pct": 100.0,
+          "discriminative": false
+        },
+        "fluid_occlusion_level": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 0.0,
+          "vocab_plus_C_pct": 0.0,
+          "discriminative": true
+        },
+        "flush_action": {
+          "n": 50,
+          "strict_pct": 68.0,
+          "vocab_pct": 68.0,
+          "vocab_plus_C_pct": 68.0,
+          "discriminative": true
+        },
+        "lesion_histology_extended": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 0.0,
+          "vocab_plus_C_pct": 0.0,
+          "discriminative": false
+        },
+        "lesion_motion_direction": {
+          "n": 50,
+          "strict_pct": 20.0,
+          "vocab_pct": 20.0,
+          "vocab_plus_C_pct": 20.0,
+          "discriminative": true
+        },
+        "lesion_screen_position": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 22.0,
+          "vocab_plus_C_pct": 22.0,
+          "discriminative": true
+        },
+        "lesion_site": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 0.0,
+          "vocab_plus_C_pct": 0.0,
+          "discriminative": true
+        },
+        "lesion_size_range": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 0.0,
+          "vocab_plus_C_pct": 0.0,
+          "discriminative": false
+        },
+        "lighting_mode": {
+          "n": 50,
+          "strict_pct": 4.0,
+          "vocab_pct": 4.0,
+          "vocab_plus_C_pct": 4.0,
+          "discriminative": false
+        },
+        "mucosa_visibility": {
+          "n": 50,
+          "strict_pct": 64.0,
+          "vocab_pct": 64.0,
+          "vocab_plus_C_pct": 64.0,
+          "discriminative": true
+        },
+        "nbi_status": {
+          "n": 50,
+          "strict_pct": 64.0,
+          "vocab_pct": 64.0,
+          "vocab_plus_C_pct": 64.0,
+          "discriminative": true
+        },
+        "occlusion_check": {
+          "n": 50,
+          "strict_pct": 52.0,
+          "vocab_pct": 52.0,
+          "vocab_plus_C_pct": 52.0,
+          "discriminative": true
+        },
+        "scope_backward_motion": {
+          "n": 50,
+          "strict_pct": 50.0,
+          "vocab_pct": 50.0,
+          "vocab_plus_C_pct": 50.0,
+          "discriminative": true
+        },
+        "scope_forward_motion": {
+          "n": 50,
+          "strict_pct": 56.00000000000001,
+          "vocab_pct": 56.00000000000001,
+          "vocab_plus_C_pct": 56.00000000000001,
+          "discriminative": true
+        },
+        "scope_motion": {
+          "n": 50,
+          "strict_pct": 56.00000000000001,
+          "vocab_pct": 56.00000000000001,
+          "vocab_plus_C_pct": 56.00000000000001,
+          "discriminative": true
+        },
+        "scope_motion_type": {
+          "n": 50,
+          "strict_pct": 50.0,
+          "vocab_pct": 50.0,
+          "vocab_plus_C_pct": 50.0,
+          "discriminative": true
+        },
+        "scope_outside": {
+          "n": 50,
+          "strict_pct": 54.0,
+          "vocab_pct": 54.0,
+          "vocab_plus_C_pct": 54.0,
+          "discriminative": true
+        },
+        "tool_catheter_check": {
+          "n": 50,
+          "strict_pct": 98.0,
+          "vocab_pct": 98.0,
+          "vocab_plus_C_pct": 98.0,
+          "discriminative": false
+        },
+        "tool_identification": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 0.0,
+          "vocab_plus_C_pct": 0.0,
+          "discriminative": false
+        }
+      },
+      "overall_1000": {
+        "n": 1000,
+        "strict_pct": 41.0,
+        "vocab_pct": 42.1,
+        "vocab_plus_C_pct": 42.1
+      },
+      "discriminative_650": {
+        "n": 650,
+        "strict_pct": 41.07692307692308,
+        "vocab_pct": 42.769230769230774,
+        "vocab_plus_C_pct": 42.769230769230774
+      }
+    },
+    "Qwen3-VL-8B": {
+      "per_question_type": {
+        "blue_dye_presence": {
+          "n": 50,
+          "strict_pct": 54.0,
+          "vocab_pct": 54.0,
+          "vocab_plus_C_pct": 54.0,
+          "discriminative": false
+        },
+        "endoscope_visibility": {
+          "n": 50,
+          "strict_pct": 98.0,
+          "vocab_pct": 98.0,
+          "vocab_plus_C_pct": 98.0,
+          "discriminative": false
+        },
+        "fluid_occlusion_level": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 0.0,
+          "vocab_plus_C_pct": 0.0,
+          "discriminative": true
+        },
+        "flush_action": {
+          "n": 50,
+          "strict_pct": 57.99999999999999,
+          "vocab_pct": 57.99999999999999,
+          "vocab_plus_C_pct": 57.99999999999999,
+          "discriminative": true
+        },
+        "lesion_histology_extended": {
+          "n": 50,
+          "strict_pct": 62.0,
+          "vocab_pct": 62.0,
+          "vocab_plus_C_pct": 62.0,
+          "discriminative": false
+        },
+        "lesion_motion_direction": {
+          "n": 50,
+          "strict_pct": 24.0,
+          "vocab_pct": 24.0,
+          "vocab_plus_C_pct": 24.0,
+          "discriminative": true
+        },
+        "lesion_screen_position": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 22.0,
+          "vocab_plus_C_pct": 22.0,
+          "discriminative": true
+        },
+        "lesion_site": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 0.0,
+          "vocab_plus_C_pct": 0.0,
+          "discriminative": true
+        },
+        "lesion_size_range": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 0.0,
+          "vocab_plus_C_pct": 0.0,
+          "discriminative": false
+        },
+        "lighting_mode": {
+          "n": 50,
+          "strict_pct": 84.0,
+          "vocab_pct": 84.0,
+          "vocab_plus_C_pct": 84.0,
+          "discriminative": false
+        },
+        "mucosa_visibility": {
+          "n": 50,
+          "strict_pct": 72.0,
+          "vocab_pct": 72.0,
+          "vocab_plus_C_pct": 72.0,
+          "discriminative": true
+        },
+        "nbi_status": {
+          "n": 50,
+          "strict_pct": 94.0,
+          "vocab_pct": 94.0,
+          "vocab_plus_C_pct": 94.0,
+          "discriminative": true
+        },
+        "occlusion_check": {
+          "n": 50,
+          "strict_pct": 54.0,
+          "vocab_pct": 54.0,
+          "vocab_plus_C_pct": 54.0,
+          "discriminative": true
+        },
+        "scope_backward_motion": {
+          "n": 50,
+          "strict_pct": 50.0,
+          "vocab_pct": 50.0,
+          "vocab_plus_C_pct": 50.0,
+          "discriminative": true
+        },
+        "scope_forward_motion": {
+          "n": 50,
+          "strict_pct": 60.0,
+          "vocab_pct": 60.0,
+          "vocab_plus_C_pct": 60.0,
+          "discriminative": true
+        },
+        "scope_motion": {
+          "n": 50,
+          "strict_pct": 57.99999999999999,
+          "vocab_pct": 57.99999999999999,
+          "vocab_plus_C_pct": 57.99999999999999,
+          "discriminative": true
+        },
+        "scope_motion_type": {
+          "n": 50,
+          "strict_pct": 52.0,
+          "vocab_pct": 52.0,
+          "vocab_plus_C_pct": 52.0,
+          "discriminative": true
+        },
+        "scope_outside": {
+          "n": 50,
+          "strict_pct": 52.0,
+          "vocab_pct": 52.0,
+          "vocab_plus_C_pct": 52.0,
+          "discriminative": true
+        },
+        "tool_catheter_check": {
+          "n": 50,
+          "strict_pct": 96.0,
+          "vocab_pct": 96.0,
+          "vocab_plus_C_pct": 96.0,
+          "discriminative": false
+        },
+        "tool_identification": {
+          "n": 50,
+          "strict_pct": 48.0,
+          "vocab_pct": 48.0,
+          "vocab_plus_C_pct": 48.0,
+          "discriminative": false
+        }
+      },
+      "overall_1000": {
+        "n": 1000,
+        "strict_pct": 50.8,
+        "vocab_pct": 51.9,
+        "vocab_plus_C_pct": 51.9
+      },
+      "discriminative_650": {
+        "n": 650,
+        "strict_pct": 44.15384615384615,
+        "vocab_pct": 45.84615384615385,
+        "vocab_plus_C_pct": 45.84615384615385
+      }
+    },
+    "Qwen3-VL-32B": {
+      "per_question_type": {
+        "blue_dye_presence": {
+          "n": 50,
+          "strict_pct": 98.0,
+          "vocab_pct": 98.0,
+          "vocab_plus_C_pct": 98.0,
+          "discriminative": false
+        },
+        "endoscope_visibility": {
+          "n": 50,
+          "strict_pct": 100.0,
+          "vocab_pct": 100.0,
+          "vocab_plus_C_pct": 100.0,
+          "discriminative": false
+        },
+        "fluid_occlusion_level": {
+          "n": 50,
+          "strict_pct": 14.000000000000002,
+          "vocab_pct": 14.000000000000002,
+          "vocab_plus_C_pct": 34.0,
+          "discriminative": true
+        },
+        "flush_action": {
+          "n": 50,
+          "strict_pct": 74.0,
+          "vocab_pct": 74.0,
+          "vocab_plus_C_pct": 74.0,
+          "discriminative": true
+        },
+        "lesion_histology_extended": {
+          "n": 50,
+          "strict_pct": 36.0,
+          "vocab_pct": 36.0,
+          "vocab_plus_C_pct": 36.0,
+          "discriminative": false
+        },
+        "lesion_motion_direction": {
+          "n": 50,
+          "strict_pct": 12.0,
+          "vocab_pct": 12.0,
+          "vocab_plus_C_pct": 12.0,
+          "discriminative": true
+        },
+        "lesion_screen_position": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 48.0,
+          "vocab_plus_C_pct": 48.0,
+          "discriminative": true
+        },
+        "lesion_site": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 10.0,
+          "vocab_plus_C_pct": 10.0,
+          "discriminative": true
+        },
+        "lesion_size_range": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 0.0,
+          "vocab_plus_C_pct": 0.0,
+          "discriminative": false
+        },
+        "lighting_mode": {
+          "n": 50,
+          "strict_pct": 2.0,
+          "vocab_pct": 2.0,
+          "vocab_plus_C_pct": 2.0,
+          "discriminative": false
+        },
+        "mucosa_visibility": {
+          "n": 50,
+          "strict_pct": 80.0,
+          "vocab_pct": 80.0,
+          "vocab_plus_C_pct": 80.0,
+          "discriminative": true
+        },
+        "nbi_status": {
+          "n": 50,
+          "strict_pct": 52.0,
+          "vocab_pct": 52.0,
+          "vocab_plus_C_pct": 52.0,
+          "discriminative": true
+        },
+        "occlusion_check": {
+          "n": 50,
+          "strict_pct": 88.0,
+          "vocab_pct": 88.0,
+          "vocab_plus_C_pct": 88.0,
+          "discriminative": true
+        },
+        "scope_backward_motion": {
+          "n": 50,
+          "strict_pct": 52.0,
+          "vocab_pct": 52.0,
+          "vocab_plus_C_pct": 52.0,
+          "discriminative": true
+        },
+        "scope_forward_motion": {
+          "n": 50,
+          "strict_pct": 76.0,
+          "vocab_pct": 76.0,
+          "vocab_plus_C_pct": 76.0,
+          "discriminative": true
+        },
+        "scope_motion": {
+          "n": 50,
+          "strict_pct": 56.00000000000001,
+          "vocab_pct": 56.00000000000001,
+          "vocab_plus_C_pct": 56.00000000000001,
+          "discriminative": true
+        },
+        "scope_motion_type": {
+          "n": 50,
+          "strict_pct": 48.0,
+          "vocab_pct": 48.0,
+          "vocab_plus_C_pct": 48.0,
+          "discriminative": true
+        },
+        "scope_outside": {
+          "n": 50,
+          "strict_pct": 96.0,
+          "vocab_pct": 96.0,
+          "vocab_plus_C_pct": 96.0,
+          "discriminative": true
+        },
+        "tool_catheter_check": {
+          "n": 50,
+          "strict_pct": 100.0,
+          "vocab_pct": 100.0,
+          "vocab_plus_C_pct": 100.0,
+          "discriminative": false
+        },
+        "tool_identification": {
+          "n": 50,
+          "strict_pct": 70.0,
+          "vocab_pct": 70.0,
+          "vocab_plus_C_pct": 70.0,
+          "discriminative": false
+        }
+      },
+      "overall_1000": {
+        "n": 1000,
+        "strict_pct": 52.7,
+        "vocab_pct": 55.60000000000001,
+        "vocab_plus_C_pct": 56.599999999999994
+      },
+      "discriminative_650": {
+        "n": 650,
+        "strict_pct": 49.84615384615385,
+        "vocab_pct": 54.307692307692314,
+        "vocab_plus_C_pct": 55.84615384615385
+      }
+    },
+    "cell3-finetuned": {
+      "per_question_type": {
+        "blue_dye_presence": {
+          "n": 50,
+          "strict_pct": 100.0,
+          "vocab_pct": 100.0,
+          "vocab_plus_C_pct": 100.0,
+          "discriminative": false
+        },
+        "endoscope_visibility": {
+          "n": 50,
+          "strict_pct": 100.0,
+          "vocab_pct": 100.0,
+          "vocab_plus_C_pct": 100.0,
+          "discriminative": false
+        },
+        "fluid_occlusion_level": {
+          "n": 50,
+          "strict_pct": 80.0,
+          "vocab_pct": 80.0,
+          "vocab_plus_C_pct": 80.0,
+          "discriminative": true
+        },
+        "flush_action": {
+          "n": 50,
+          "strict_pct": 50.0,
+          "vocab_pct": 50.0,
+          "vocab_plus_C_pct": 50.0,
+          "discriminative": true
+        },
+        "lesion_histology_extended": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 0.0,
+          "vocab_plus_C_pct": 0.0,
+          "discriminative": false
+        },
+        "lesion_motion_direction": {
+          "n": 50,
+          "strict_pct": 20.0,
+          "vocab_pct": 20.0,
+          "vocab_plus_C_pct": 20.0,
+          "discriminative": true
+        },
+        "lesion_screen_position": {
+          "n": 50,
+          "strict_pct": 26.0,
+          "vocab_pct": 26.0,
+          "vocab_plus_C_pct": 26.0,
+          "discriminative": true
+        },
+        "lesion_site": {
+          "n": 50,
+          "strict_pct": 22.0,
+          "vocab_pct": 22.0,
+          "vocab_plus_C_pct": 22.0,
+          "discriminative": true
+        },
+        "lesion_size_range": {
+          "n": 50,
+          "strict_pct": 100.0,
+          "vocab_pct": 100.0,
+          "vocab_plus_C_pct": 100.0,
+          "discriminative": false
+        },
+        "lighting_mode": {
+          "n": 50,
+          "strict_pct": 100.0,
+          "vocab_pct": 100.0,
+          "vocab_plus_C_pct": 100.0,
+          "discriminative": false
+        },
+        "mucosa_visibility": {
+          "n": 50,
+          "strict_pct": 48.0,
+          "vocab_pct": 48.0,
+          "vocab_plus_C_pct": 48.0,
+          "discriminative": true
+        },
+        "nbi_status": {
+          "n": 50,
+          "strict_pct": 50.0,
+          "vocab_pct": 50.0,
+          "vocab_plus_C_pct": 50.0,
+          "discriminative": true
+        },
+        "occlusion_check": {
+          "n": 50,
+          "strict_pct": 50.0,
+          "vocab_pct": 50.0,
+          "vocab_plus_C_pct": 50.0,
+          "discriminative": true
+        },
+        "scope_backward_motion": {
+          "n": 50,
+          "strict_pct": 50.0,
+          "vocab_pct": 50.0,
+          "vocab_plus_C_pct": 50.0,
+          "discriminative": true
+        },
+        "scope_forward_motion": {
+          "n": 50,
+          "strict_pct": 54.0,
+          "vocab_pct": 54.0,
+          "vocab_plus_C_pct": 54.0,
+          "discriminative": true
+        },
+        "scope_motion": {
+          "n": 50,
+          "strict_pct": 48.0,
+          "vocab_pct": 48.0,
+          "vocab_plus_C_pct": 48.0,
+          "discriminative": true
+        },
+        "scope_motion_type": {
+          "n": 50,
+          "strict_pct": 50.0,
+          "vocab_pct": 50.0,
+          "vocab_plus_C_pct": 50.0,
+          "discriminative": true
+        },
+        "scope_outside": {
+          "n": 50,
+          "strict_pct": 96.0,
+          "vocab_pct": 96.0,
+          "vocab_plus_C_pct": 96.0,
+          "discriminative": true
+        },
+        "tool_catheter_check": {
+          "n": 50,
+          "strict_pct": 98.0,
+          "vocab_pct": 98.0,
+          "vocab_plus_C_pct": 98.0,
+          "discriminative": false
+        },
+        "tool_identification": {
+          "n": 50,
+          "strict_pct": 0.0,
+          "vocab_pct": 0.0,
+          "vocab_plus_C_pct": 0.0,
+          "discriminative": false
+        }
+      },
+      "overall_1000": {
+        "n": 1000,
+        "strict_pct": 57.099999999999994,
+        "vocab_pct": 57.099999999999994,
+        "vocab_plus_C_pct": 57.099999999999994
+      },
+      "discriminative_650": {
+        "n": 650,
+        "strict_pct": 49.53846153846154,
+        "vocab_pct": 49.53846153846154,
+        "vocab_plus_C_pct": 49.53846153846154
+      }
+    }
+  },
+  "finding_C_false_positives": "All 10 rows [C] credits match only on 'clear', and every one is a Qwen3-VL-32B answer whose stated verdict is 'minimal to mild' or 'mild to moderate' -- fluid IS present. 'clear' appears as 'small amounts of CLEAR fluid' (describing transparency) or 'the lumen is mostly clear with only small amounts of fluid' (qualified). 'none', 'no fluid', 'no fluid visible' match ZERO rows. [C] therefore credits nothing legitimate and is reported for completeness only -- recommend dropping it."
+}

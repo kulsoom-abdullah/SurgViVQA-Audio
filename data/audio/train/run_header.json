@@ -1,0 +1,51 @@
+{
+  "seed": 20260725,
+  "split": "train",
+  "voice_split_path": "data/voices/voice_split.json",
+  "voice_split_sha256": "31471772f28fde019175d49cf5091a2ea16a5a72a95de943a25946f68ffb1d57",
+  "edge_tts_version": "7.2.7",
+  "utc_timestamp": "2026-07-26T02:59:07.202743+00:00",
+  "key_scheme": "K2",
+  "rows": 2302,
+  "canonical_files": 460,
+  "canonical_newly_synthesized": 460,
+  "hardlinks": 2302,
+  "copies": 0,
+  "voices": [
+    "en-AU-NatashaNeural",
+    "en-AU-WilliamMultilingualNeural",
+    "en-CA-ClaraNeural",
+    "en-GB-LibbyNeural",
+    "en-GB-MaisieNeural",
+    "en-GB-RyanNeural",
+    "en-GB-SoniaNeural",
+    "en-HK-SamNeural",
+    "en-HK-YanNeural",
+    "en-IE-ConnorNeural",
+    "en-KE-ChilembaNeural",
+    "en-NG-EzinneNeural",
+    "en-PH-JamesNeural",
+    "en-SG-LunaNeural",
+    "en-TZ-ElimuNeural",
+    "en-US-AndrewNeural",
+    "en-US-AriaNeural",
+    "en-US-AvaNeural",
+    "en-US-BrianNeural",
+    "en-US-ChristopherNeural",
+    "en-US-JennyNeural",
+    "en-US-RogerNeural",
+    "en-ZA-LeahNeural"
+  ],
+  "collapsed_personas": [
+    "en-IN-NeerjaExpressiveNeural",
+    "en-US-AndrewMultilingualNeural",
+    "en-US-AvaMultilingualNeural",
+    "en-US-BrianMultilingualNeural",
+    "en-US-EmmaMultilingualNeural"
+  ],
+  "excluded_voices": [
+    "en-US-AnaNeural"
+  ],
+  "max_concurrency": 4,
+  "duration_probe_failures": 0
+}

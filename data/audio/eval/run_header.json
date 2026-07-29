@@ -1,0 +1,37 @@
+{
+  "seed": 20260725,
+  "split": "eval",
+  "voice_split_path": "data/voices/voice_split.json",
+  "voice_split_sha256": "31471772f28fde019175d49cf5091a2ea16a5a72a95de943a25946f68ffb1d57",
+  "edge_tts_version": "7.2.7",
+  "utc_timestamp": "2026-07-26T02:59:46.096625+00:00",
+  "key_scheme": "K2",
+  "rows": 398,
+  "canonical_files": 180,
+  "canonical_newly_synthesized": 180,
+  "hardlinks": 398,
+  "copies": 0,
+  "voices": [
+    "en-CA-LiamNeural",
+    "en-GB-ThomasNeural",
+    "en-NZ-MitchellNeural",
+    "en-PH-RosaNeural",
+    "en-SG-WayneNeural",
+    "en-TZ-ImaniNeural",
+    "en-US-GuyNeural",
+    "en-US-MichelleNeural",
+    "en-ZA-LukeNeural"
+  ],
+  "collapsed_personas": [
+    "en-IN-NeerjaExpressiveNeural",
+    "en-US-AndrewMultilingualNeural",
+    "en-US-AvaMultilingualNeural",
+    "en-US-BrianMultilingualNeural",
+    "en-US-EmmaMultilingualNeural"
+  ],
+  "excluded_voices": [
+    "en-US-AnaNeural"
+  ],
+  "max_concurrency": 4,
+  "duration_probe_failures": 0
+}

@@ -1,0 +1,285 @@
+diff --git a/src/evaluate_checkpoint.py b/src/evaluate_checkpoint.py
+index 5214137..52aa9be 100644
+--- a/src/evaluate_checkpoint.py
++++ b/src/evaluate_checkpoint.py
+@@ -40,6 +40,9 @@ warnings.filterwarnings("ignore", message=".*meta parameter.*", category=UserWar
+ import torch
+ import json
+ import argparse
++import sys
++import subprocess
++import datetime
+ from pathlib import Path
+ from tqdm import tqdm
+ from transformers import Qwen2VLForConditionalGeneration, AutoTokenizer, AutoProcessor, WhisperFeatureExtractor
+@@ -49,6 +52,49 @@ import librosa
+ # Using your merged Stage 1 + Stage 2 checkpoint from HuggingFace
+ AUDIO_ADAPTED_MODEL_ID = "kulsoom-abdullah/Qwen2-Audio-7B-Transcription"
+ 
++_REPO_DIR = Path(__file__).resolve().parent
++
++def _git(*cmd):
++    """Run a git command against THIS script's repo, not the process CWD.
++
++    On failure returns the literal error string, never None: an absent .git, an
++    unborn HEAD, or a missing git binary must be visible in the manifest rather
++    than silently blank.
++    """
++    try:
++        return subprocess.check_output(
++            ["git", *cmd], cwd=_REPO_DIR, stderr=subprocess.STDOUT
++        ).decode().strip()
++    except subprocess.CalledProcessError as e:
++        return f"GIT_ERROR({e.returncode}): {e.output.decode().strip()}"
++    except Exception as e:
++        return f"GIT_ERROR: {type(e).__name__}: {e}"
++
++def _git_sha():
++    """Current commit for run provenance."""
++    return _git("rev-parse", "HEAD")
++
++def _git_ref():
++    """Branch name, or the literal 'HEAD' when detached — that IS the detachment
++    signal, since `rev-parse HEAD` returns an ordinary sha either way."""
++    return _git("rev-parse", "--abbrev-ref", "HEAD")
++
++def _git_dirty():
++    """True when the working tree differs from HEAD (untracked files count).
++
++    A run of uncommitted code recording a clean-looking sha is the provenance
++    failure the manifest exists to prevent.
++    """
++    out = _git("status", "--porcelain")
++    return out if out.startswith("GIT_ERROR") else bool(out)
++
++def k2_key(row):
++    """Audio filename key. The bare `id` is NOT unique — it repeats across videos
++    and splits with different questions attached, so a flat {id}.mp3 lookup can
++    silently return a different question's audio. K2 is collision-free across all
++    3700 corpus rows."""
++    return f"{row['video_id']}_{row['id']}_{row['question_type']}"
++
+ def load_frames(frame_names, frames_dir, max_size=384):
+     """Load and resize frames"""
+     images = []
+@@ -96,6 +142,79 @@ def evaluate(args):
+     print("SURGICAL VQA EVALUATION")
+     print("="*80)
+ 
++    # ------------------------------------------------------------------
++    # Pre-flight (runs BEFORE model load): load eval data, resolve the
++    # audio files this arm requires, and write a run manifest so an
++    # aborted run still records what was attempted. A silence run (missing
++    # audio) must never be mistakable for a real audio measurement, hence
++    # the coverage gate below.
++    # ------------------------------------------------------------------
++    print(f"📁 Loading eval data: {args.eval_data_path}")
++    eval_data = [json.loads(line) for line in open(args.eval_data_path)]
++    print(f"✓ Loaded {len(eval_data)} samples")
++
++    # Ablation arm: precompute the audio-source pairing only when needed
++    mismatch_map = build_mismatch_map(eval_data) if args.input_mode == "mismatched_audio" else None
++
++    use_audio = args.input_mode in ("audio_text", "audio_only", "mismatched_audio")
++    if use_audio and args.input_mode == "mismatched_audio":
++        # mismatched_audio speaks a DIFFERENT sample's question, so the required
++        # files are the paired sources, not the sample ids themselves.
++        required_keys = [k2_key(eval_data[mismatch_map[i]]) for i in range(len(eval_data))]
++    elif use_audio:
++        required_keys = [k2_key(s) for s in eval_data]
++    else:
++        required_keys = []
++
++    required = len(required_keys)
++    missing_paths = [str(Path(args.audio_dir) / f"{key}.mp3") for key in required_keys
++                     if not (Path(args.audio_dir) / f"{key}.mp3").exists()]
++    found = required - len(missing_paths)
++    coverage_fraction = (found / required) if required else None
++
++    if use_audio:
++        print(f"AUDIO COVERAGE: {found}/{required} found in {args.audio_dir}")
++
++    # Run manifest — written before model load; total/correct/accuracy filled after.
++    manifest = {
++        "argv": sys.argv,
++        "audio_dir": str(Path(args.audio_dir).resolve()),
++        "eval_data_path": str(Path(args.eval_data_path).resolve()),
++        "audio_required": required,
++        "audio_found": found if use_audio else 0,
++        "coverage_fraction": coverage_fraction,
++        "input_mode": args.input_mode,
++        "allow_missing_audio": args.allow_missing_audio,
++        "checkpoint_path": args.checkpoint_path,
++        "key_scheme": "K2",
++        "adapter_loaded": not args.no_adapter,
++        "git_sha": _git_sha(),
++        "git_ref": _git_ref(),
++        "git_dirty": _git_dirty(),
++        "utc_timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
++        "total": None,
++        "correct": None,
++        "accuracy": None,
++    }
++    manifest_path = Path(str(args.output_file) + ".manifest.json")
++    manifest_path.parent.mkdir(parents=True, exist_ok=True)
++    with open(manifest_path, 'w') as mf:
++        json.dump(manifest, mf, indent=2)
++
++    print("RUN MANIFEST:")
++    for k, v in manifest.items():
++        print(f"  {k}: {v}")
++
++    if use_audio and missing_paths:
++        print(f"  {min(5, len(missing_paths))} of {len(missing_paths)} required audio files missing (first 5):")
++        for m in missing_paths[:5]:
++            print(f"    MISSING: {m}")
++        if not args.allow_missing_audio:
++            print("❌ Refusing to run: required audio files are missing and "
++                  "--allow_missing_audio was not set. A silent run is not a valid "
++                  "audio measurement.")
++            sys.exit(1)
++
+     # Load base model + LoRA adapters
+     print(f"\n⏳ Loading base model and adapters from: {args.checkpoint_path}")
+ 
+@@ -120,10 +239,14 @@ def evaluate(args):
+         trust_remote_code=True
+     )
+ 
+-    # Load LoRA adapters
+-    from peft import PeftModel
+-    print(f"Loading LoRA adapters from: {args.checkpoint_path}")
+-    model = PeftModel.from_pretrained(base_model, args.checkpoint_path)
++    # Load LoRA adapters — skipped for the un-fine-tuned base (baseline cells 1 and 2)
++    if args.no_adapter:
++        print("⚠️  --no_adapter: using the audio-adapted BASE model, no LoRA adapters")
++        model = base_model
++    else:
++        from peft import PeftModel
++        print(f"Loading LoRA adapters from: {args.checkpoint_path}")
++        model = PeftModel.from_pretrained(base_model, args.checkpoint_path)
+     model.eval()
+ 
+     # Load processor from Qwen2-VL base
+@@ -138,13 +261,8 @@ def evaluate(args):
+         # Note: We don't resize embeddings here since checkpoint already has it
+     feature_extractor = WhisperFeatureExtractor.from_pretrained("openai/whisper-large-v3-turbo")
+ 
+-    # Load eval data
+-    print(f"📁 Loading eval data: {args.eval_data_path}")
+-    eval_data = [json.loads(line) for line in open(args.eval_data_path)]
+-    print(f"✓ Loaded {len(eval_data)} samples")
+-
+-    # Ablation arm: precompute the audio-source pairing only when needed
+-    mismatch_map = build_mismatch_map(eval_data) if args.input_mode == "mismatched_audio" else None
++    # (eval data, mismatch map, audio coverage, and run manifest were resolved
++    #  in the pre-flight above, before model load.)
+ 
+     # Run evaluation
+     results = []
+@@ -156,20 +274,23 @@ def evaluate(args):
+     for idx, sample in enumerate(tqdm(eval_data, desc="Evaluating")):
+         try:
+             # --- Resolve ablation arm (see --input_mode) ---
+-            use_audio = args.input_mode in ("audio_text", "audio_only", "mismatched_audio")
++            # use_audio comes from the pre-flight; one definition only, since the
++            # summary block below reports coverage off the same predicate.
+             # only audio_only drops the question text; mismatched_audio keeps the CORRECT
+             # text and swaps the audio, so it stays in the training (audio+text) distribution
+             include_question = args.input_mode in ("audio_text", "text_only", "mismatched_audio")
+             if args.input_mode == "mismatched_audio":
+-                audio_id = eval_data[mismatch_map[idx]]['id']  # spoken question from a DIFFERENT sample
++                audio_row = eval_data[mismatch_map[idx]]  # spoken question from a DIFFERENT sample
+             else:
+-                audio_id = sample['id']
++                audio_row = sample
+ 
+             # Load audio (only when the arm uses it)
+             input_features = None
++            audio_found_row = None
+             if use_audio:
+-                audio_path = Path(args.audio_dir) / f"{audio_id}.mp3"
+-                if audio_path.exists():
++                audio_path = Path(args.audio_dir) / f"{k2_key(audio_row)}.mp3"
++                audio_found_row = audio_path.exists()
++                if audio_found_row:
+                     y, _ = librosa.load(audio_path, sr=16000, mono=True)
+                 else:
+                     y = torch.zeros(16000 * 2)
+@@ -240,7 +361,8 @@ def evaluate(args):
+                 'correct': int(is_correct),
+                 'exact_match': int(is_correct),
+                 'input_mode': args.input_mode,
+-                'audio_source_id': audio_id if use_audio else None
++                'audio_source_id': k2_key(audio_row) if use_audio else None,
++                'audio_found': audio_found_row if use_audio else None
+             }
+             results.append(result)
+ 
+@@ -266,6 +388,13 @@ def evaluate(args):
+     # Print summary
+     accuracy = (correct / total * 100) if total > 0 else 0
+ 
++    # Backfill the run manifest with final results (it was written pre-model).
++    manifest["total"] = total
++    manifest["correct"] = correct
++    manifest["accuracy"] = accuracy
++    with open(manifest_path, 'w') as mf:
++        json.dump(manifest, mf, indent=2)
++
+     print("\n" + "="*80)
+     print("EVALUATION RESULTS")
+     print("="*80)
+@@ -273,6 +402,12 @@ def evaluate(args):
+     print(f"Total samples: {total}")
+     print(f"Correct: {correct}")
+     print(f"Accuracy: {accuracy:.2f}%")
++    if use_audio:
++        # Printed for EVERY audio arm, not just degraded ones, so the line's
++        # presence is never itself the warning — only the bracket is.
++        pct = coverage_fraction * 100 if coverage_fraction is not None else 0.0
++        flag = "  [SILENCE FALLBACK ACTIVE]" if found < required else ""
++        print(f"AUDIO COVERAGE: {found}/{required} ({pct:.1f}%){flag}")
+     print(f"Goal: Beat 46% baseline (audio+image zero-shot)")
+     print("="*80)
+ 
+@@ -280,8 +415,8 @@ def evaluate(args):
+     if 'question_type' in eval_data[0]:
+         print("\nAccuracy by Question Type:")
+         type_stats = {}
+-        for result, sample in zip(results, eval_data):
+-            qtype = sample['question_type']
++        for result in results:
++            qtype = result['question_type']
+             if qtype not in type_stats:
+                 type_stats[qtype] = {'correct': 0, 'total': 0}
+             type_stats[qtype]['total'] += 1
+@@ -295,8 +430,8 @@ def evaluate(args):
+ 
+ def main():
+     parser = argparse.ArgumentParser(description="Evaluate surgical VQA checkpoint")
+-    parser.add_argument("--checkpoint_path", type=str, required=True,
+-                       help="Path to trained checkpoint")
++    parser.add_argument("--checkpoint_path", type=str, default=None,
++                       help="Path to trained checkpoint (required unless --no_adapter)")
+     parser.add_argument("--eval_data_path", type=str, required=True,
+                        help="Path to eval JSONL file")
+     parser.add_argument("--frames_dir", type=str, required=True,
+@@ -313,8 +448,17 @@ def main():
+                        choices=["audio_text", "text_only", "audio_only", "mismatched_audio"],
+                        help="Ablation arm (default audio_text = training/deployment layout). "
+                             "See module docstring; audio_text is the sanity gate.")
++    parser.add_argument("--allow_missing_audio", action="store_true", default=False,
++                       help="Proceed even if audio files are missing (runs on silence). "
++                            "Off by default: a silent run is not a valid audio measurement.")
++    parser.add_argument("--no_adapter", action="store_true", default=False,
++                       help="Skip the LoRA adapters and evaluate the un-fine-tuned "
++                            "audio-adapted BASE model (baseline cells 1 and 2). "
++                            "Recorded as adapter_loaded=false in the run manifest.")
+ 
+     args = parser.parse_args()
++    if not args.no_adapter and args.checkpoint_path is None:
++        parser.error("--checkpoint_path is required unless --no_adapter is set")
+     evaluate(args)
+ 
+ if __name__ == "__main__":

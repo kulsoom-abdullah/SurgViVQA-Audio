@@ -1,0 +1,94 @@
+{
+  "seed": 20260725,
+  "roster_path": "data/voices/en_voices_raw.txt",
+  "pool_size": 41,
+  "collapsed_personas": [
+    "en-IN-NeerjaExpressiveNeural",
+    "en-US-AndrewMultilingualNeural",
+    "en-US-AvaMultilingualNeural",
+    "en-US-BrianMultilingualNeural",
+    "en-US-EmmaMultilingualNeural"
+  ],
+  "excluded_voices": [
+    "en-US-AnaNeural"
+  ],
+  "pinned": {
+    "en-IN-NeerjaNeural": "test"
+  },
+  "quotas": {
+    "N.America": {
+      "train": 8,
+      "eval": 3,
+      "test": 3
+    },
+    "BritishIsles": {
+      "train": 5,
+      "eval": 1,
+      "test": 1
+    },
+    "Oceania": {
+      "train": 2,
+      "eval": 1,
+      "test": 1
+    },
+    "Asia": {
+      "train": 4,
+      "eval": 2,
+      "test": 2
+    },
+    "Africa": {
+      "train": 4,
+      "eval": 2,
+      "test": 2
+    }
+  },
+  "splits": {
+    "train": [
+      "en-AU-NatashaNeural",
+      "en-AU-WilliamMultilingualNeural",
+      "en-CA-ClaraNeural",
+      "en-GB-LibbyNeural",
+      "en-GB-MaisieNeural",
+      "en-GB-RyanNeural",
+      "en-GB-SoniaNeural",
+      "en-HK-SamNeural",
+      "en-HK-YanNeural",
+      "en-IE-ConnorNeural",
+      "en-KE-ChilembaNeural",
+      "en-NG-EzinneNeural",
+      "en-PH-JamesNeural",
+      "en-SG-LunaNeural",
+      "en-TZ-ElimuNeural",
+      "en-US-AndrewNeural",
+      "en-US-AriaNeural",
+      "en-US-AvaNeural",
+      "en-US-BrianNeural",
+      "en-US-ChristopherNeural",
+      "en-US-JennyNeural",
+      "en-US-RogerNeural",
+      "en-ZA-LeahNeural"
+    ],
+    "eval": [
+      "en-CA-LiamNeural",
+      "en-GB-ThomasNeural",
+      "en-NZ-MitchellNeural",
+      "en-PH-RosaNeural",
+      "en-SG-WayneNeural",
+      "en-TZ-ImaniNeural",
+      "en-US-GuyNeural",
+      "en-US-MichelleNeural",
+      "en-ZA-LukeNeural"
+    ],
+    "test": [
+      "en-IE-EmilyNeural",
+      "en-IN-NeerjaNeural",
+      "en-IN-PrabhatNeural",
+      "en-KE-AsiliaNeural",
+      "en-NG-AbeoNeural",
+      "en-NZ-MollyNeural",
+      "en-US-EmmaNeural",
+      "en-US-EricNeural",
+      "en-US-SteffanNeural"
+    ]
+  }
+}
