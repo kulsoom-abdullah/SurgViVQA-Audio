@@ -214,10 +214,6 @@ pip install -r requirements.txt
 
 Running on 1x RTX 4090.
 
-[![Watch the Demo](docs/demo_screenshot.png)](https://www.loom.com/share/e6259484ed0f4ad2aac584860c0d32f0)
-
-> *Demo video — metrics under revision.*
-
 To launch the interactive surgical VQA assistant:
 
 ```bash
@@ -319,7 +315,6 @@ SurgViVQA-Audio/
 │   ├── app.py                      # Streamlit Demo (Interactive inference)
 │   └── evaluate_checkpoint.py      # Standalone evaluation script
 ├── docs/
-│   ├── demo_screenshot.png        # for embedded video
 │   ├── train_loss.png             # W&B plot
 │   ├── eval_loss.png              # W&B plot
 │   ├── data_distribution.md       # detailed stats

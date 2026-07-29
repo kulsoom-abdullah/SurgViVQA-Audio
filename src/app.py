@@ -3,6 +3,9 @@ SurgViVQA-Audio: Interactive Demo with Flipbook Animation
 Natural language questions (OUT template) + Question type filtering
 """
 
+# Requires a CUDA GPU (4-bit quantization). Not re-verified since the
+# audio-only migration - the code is correct by inspection, not by execution.
+
 import streamlit as st
 import torch
 import librosa
@@ -26,7 +29,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # --- CONFIGURATION ---
-CHECKPOINT_PATH = "./checkpoints/surgical_vqa_multivideo"
+CHECKPOINT_PATH = "./checkpoints/cell3_audio_only"
 DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 AUDIO_ADAPTED_MODEL_ID = "kulsoom-abdullah/Qwen2-Audio-7B-Transcription"
 
@@ -123,7 +126,7 @@ def get_frames(sample, frames_dir="data/frames"):
     return images
 
 # --- INFERENCE FUNCTION ---
-def run_inference(model, processor, tokenizer, feature_extractor, frames, audio_array, question_text):
+def run_inference(model, processor, tokenizer, feature_extractor, frames, audio_array):
     """Run model inference with audio adapter"""
 
     # 1. Process audio
@@ -134,7 +137,10 @@ def run_inference(model, processor, tokenizer, feature_extractor, frames, audio_
     content = [{"type": "image"} for _ in frames]
     content.append({
         "type": "text",
-        "text": f"User Question: {question_text}\nAnswer the question concisely based on the visual and audio."
+        # Audio-only: the question reaches the model ONLY as speech. Delivering it
+        # as text too was the leak that made the audio arm uninterpretable.
+        # Byte-identical to evaluate_checkpoint.py:309.
+        "text": "Answer the question concisely based on the visual and audio evidence."
     })
     msgs = [{"role": "user", "content": content}]
 
@@ -258,20 +264,8 @@ with st.sidebar:
 
 # 5. Model Strengths (The Behavioral Profile)
     st.markdown("### 🧠 Model Capability Profile")
-    st.info("""
-    **✅ 100% Reliable (Static):**
-    * Blue Dye Presence
-    * Lighting Mode (NBI/White)
-    * Endoscope Visibility
-    
-    **⚠️ 84% Reliable (Safety):**
-    * Occlusion Check (Blocked View?)
-    
-    **📉 20-55% Reliable (Dynamic):**
-    * Motion (Is scope advancing?)
-    * Precise Localization (Which quadrant?)
-    """)
-    
+    st.caption("Per-question-type accuracy varies substantially; see README results.")
+
     st.caption("Based on held-out test video 002-004")
 
 # --- MAIN CONTENT ---
@@ -344,7 +338,7 @@ with col_audio:
                 # Run inference
                 prediction = run_inference(
                     model, processor, tokenizer, feature_extractor,
-                    frames, audio_array, sample['question']
+                    frames, audio_array
                 )
 
                 st.session_state.prediction = prediction
@@ -378,8 +372,6 @@ with col_result:
             st.success("🎉 **Correct!** Model prediction matches ground truth.")
         else:
             st.info(f"💡 **Analysis:** This is a `{sample['question_type']}` question. These can be challenging.")
-            if sample['question_type'] in ['scope_motion', 'lesion_motion_direction']:
-                st.caption("Motion questions have lower accuracy (45-54%) - temporal modeling is hard!")
     else:
         st.info("👆 Record audio and click 'Run Inference' to see prediction")
 
