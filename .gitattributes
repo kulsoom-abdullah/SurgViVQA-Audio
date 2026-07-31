@@ -1,0 +1,9 @@
+# transformers_fork/ is a vendored copy of huggingface/transformers carrying the audio
+# adapter path this project depends on. It is 4,797 of the repo's ~5,780 tracked files, so
+# without this GitHub's language statistics describe someone else's code rather than this
+# project's. Marking it vendored excludes it from the language bar and collapses it in
+# diffs; it stays in the tree because the audio pathway does not work without it.
+transformers_fork/** linguist-vendored
+
+# Generated viewer output — HTML with inlined data, not hand-written source.
+viewer/*.html linguist-generated
