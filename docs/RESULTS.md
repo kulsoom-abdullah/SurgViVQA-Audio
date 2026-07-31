@@ -77,7 +77,15 @@ emitted every time. Uses no video.
 
 **Transferred-prior floor.** The most common answer *in the training set* per question
 type, scored on test — the score reachable by identifying the question by ear and answering
-from the training distribution: **57.3%** on the full 1,000.
+from the training distribution.
+
+| | full 1,000 | discriminative 650 |
+|---|---|---|
+| transferred-prior floor | **57.3%** | **42.0%** |
+
+This is the floor the README leads with, because unlike the test-prior floor above it is
+reachable by a deployable system: it needs the training answer distribution, not the test
+labels.
 
 This floor is noisy. Two question types are near coin flips in training
 (`lesion_histology_extended` 43 vs 42, `tool_identification` 37 vs 35 vs 13) while being
@@ -402,9 +410,219 @@ on the discriminative 650 should be.
 
 ---
 
-## 10. Future work
+## 10. Omni baseline
 
-Ordered by expected value, none of it run:
+**Question.** Does an off-the-shelf omni model already do this task zero-shot, without the
+fine-tuning this project did?
+
+**Pre-registration.** Criteria, outcome bands, scoring rules and abandonment conditions were
+fixed in [`PRE_REGISTRATION.md`](../PRE_REGISTRATION.md), committed with no code and no
+results and tagged `prereg-omni-baseline` (`6add479`) before any baseline model was
+downloaded. Everything below is the pre-specified analysis run against the data, not an
+analysis chosen after seeing it.
+
+### 10.1 Arm
+
+**MiniCPM-o 4.5** (`openbmb/MiniCPM-o-4_5`, rev `44151b3`, 9B) — SigLIP2 + Whisper-medium +
+Qwen3-8B, a Whisper encoder projected into an LLM. That is this project's own design, built
+by a better-resourced team, which is why it was preferred over the safer candidate.
+
+Identical to the fine-tuned arm on everything that could otherwise explain a difference: the
+same 1,000 held-out rows, the same audio clips, the same 8 frames, the same instruction
+string (byte-pinned, sha256 `19cdcc49…`), greedy decoding, and the same grading rule.
+
+The generate path was verified before it was measured. `adapters_sha256` in the run manifest
+equals the value in the Gate 3 probe artifact (`120920ef…`), so the determinism, audio-
+pathway and image-pathway gates were passed by the code that produced these numbers rather
+than by something resembling it.
+
+**Phi-4-multimodal** was screened and attempted but never probed: `torch.OutOfMemoryError` at
+the first generation, requesting 29.5 GiB for a single attention matrix on top of 44 GB
+resident, on a 48 GB card, with 8 frames plus audio at the eager attention its model card
+sanctions. Zero gates reached, no artifacts written. Recorded as a **capacity result, not a
+capability one** — nothing about its audio or vision pathway was measured.
+
+### 10.2 Headline
+
+| | full 1,000 | discriminative 650 |
+|---|---|---|
+| MiniCPM-o 4.5, zero-shot, audio question | **47.1%** | **43.1%** |
+
+Lenient and strict scoring agree on **all 1,000 rows** — zero disagreements — as they do for
+the fine-tuned arm (§2).
+
+**A sensitivity check, not the headline.** Two rows were adjudicated as false credits: both
+`fluid_occlusion_level`, gold `complete`, credited because `completely` appears in the
+prediction, once inside a negation ("*moderate, partially obstructing the view but not
+completely blocking it*"). Striking both gives 46.9% / 42.8%. The headline keeps the frozen
+rule, because that is the rule the fine-tune's 57.1% was scored under and revising it would
+break comparability.
+
+**The grading rule favours this project's own model by roughly 10×, and was left unchanged
+anyway.** The carve-out audit was run symmetrically on both arms. The fine-tuned model —
+this project's system, the one the whole repository exists to present — is credited by a
+carve-out on **19 rows**. The baseline gets **2**. All 19 of the fine-tune's are legitimate;
+one of the baseline's two contradicts its own gold answer.
+
+So the frozen rule hands `M_ft` about ten times the benefit it hands the model it is being
+compared against, and removing the rule would cost `M_ft` 1.9 points against the baseline's
+0.2. It was left in place, because it is the rule the 57.1% was measured under and changing
+it after seeing the comparison is exactly the move pre-registration exists to prevent. The
+asymmetry is reported here rather than left for a reader to discover.
+
+### 10.3 The result is not reportable as a capability measurement
+
+§5.2 of the pre-registration set a blocking audit: sample 30 incorrect rows, classify each as
+a content failure (answered the question, answer wrong) or a format failure (right content,
+lexically missed — including answering in vocabulary the corpus does not use). **Above 20%
+format failures, the strict number is not reportable as a capability measurement.**
+
+| | count | rate |
+|---|---|---|
+| content failure | 20 / 30 | 66.7% |
+| **format failure** | **10 / 30** | **33.3%** |
+
+Threshold breached. Ten failures are unscoreable rather than wrong: two are hyphenation
+(`lower right quadrant` against gold `lower-right`), eight are out-of-corpus vocabulary.
+
+The cause is visible in the answer sets, which the model is never shown:
+
+```
+fluid_occlusion_level  {absent, complete}        <- binary
+lesion_site            {sigma, rectum}           <- binary
+lesion_screen_position {upper-left, upper-right, lower-left, lower-right}
+```
+
+A model answering *"moderate"* to a question whose only options are `absent` and `complete`,
+or *"colon"* where the options are `sigma` and `rectum`, has produced a defensible reading of
+the scene in vocabulary this benchmark does not contain. §5.3 pre-registered exactly this and
+pre-committed to **not** reading it as below-chance capability.
+
+Sensitivity of the classification, since it decides reportability:
+
+| reading | rate | breached? |
+|---|---|---|
+| lexical only (hyphenation) | 2 / 30 = 6.7% | no |
+| excluding gross anatomical errors (`esophagus`, `stomach`) | 7 / 30 = 23.3% | **yes** |
+| **pre-registered — all out-of-corpus vocabulary** | **10 / 30 = 33.3%** | **yes** |
+
+**A census, not a sample, of the 16 predictions longer than 15 words: 5 are incorrect and all
+5 are this failure mode**, every one `fluid_occlusion_level` answered in severity vocabulary
+("moderate to severe", "mild to moderate"). The long tail is where format failure
+concentrates, as predicted.
+
+The over-credited direction was audited too, on 30 random **correct** rows: **0 false
+credits**. §5.2 as written audits only under-crediting; extending it to both directions was
+added post-data and is logged in §10 of the pre-registration.
+
+**The pre-registered remedy is unavailable.** §5.2 routes the capability claim to lenient
+scoring when strict is compromised — but lenient and strict agree on all 1,000 rows, so
+there is no second metric to fall back to. No third variant was invented. **No comparison to
+this project's 49.5% on the 650 is licensed by this evidence.**
+
+### 10.4 Per question type
+
+Strict scoring, frozen rule. Chance is `1/|A_t|`. All 20 types have n = 50, so none is
+underpowered; per §5.4 of the pre-registration every row is suggestive only and **no
+single-type comparison is called significant** — with 20 types the multiple-comparison
+problem makes that meaningless. The honest use of this table is detecting collapse.
+
+| question type | n | strict acc | Wilson 95% CI | chance | note |
+|---|---|---|---|---|---|
+| `nbi_status` | 50 | 1.000 | [0.929, 1.000] | 0.500 | |
+| `lesion_histology_extended` | 50 | 0.980 | [0.895, 0.996] | 1.000 | degenerate |
+| `lighting_mode` | 50 | 0.980 | [0.895, 0.996] | 1.000 | degenerate |
+| `endoscope_visibility` | 50 | 0.960 | [0.865, 0.989] | 1.000 | degenerate |
+| `flush_action` | 50 | 0.700 | [0.562, 0.809] | 0.500 | |
+| `blue_dye_presence` | 50 | 0.660 | [0.522, 0.776] | 1.000 | degenerate |
+| `occlusion_check` | 50 | 0.620 | [0.482, 0.741] | 0.500 | |
+| `mucosa_visibility` | 50 | 0.580 | [0.442, 0.706] | 0.500 | |
+| `scope_motion` | 50 | 0.560 | [0.423, 0.688] | 0.500 | |
+| `scope_outside` | 50 | 0.520 | [0.385, 0.652] | 0.500 | |
+| `scope_forward_motion` | 50 | 0.500 | [0.366, 0.634] | 0.500 | |
+| `scope_motion_type` | 50 | 0.480 | [0.348, 0.615] | 0.500 | |
+| `scope_backward_motion` | 50 | 0.440 | [0.312, 0.577] | 0.500 | |
+| `tool_catheter_check` | 50 | 0.220 | [0.128, 0.352] | 1.000 | degenerate |
+| `lesion_motion_direction` | 50 | 0.160 | [0.083, 0.285] | 0.200 | |
+| `fluid_occlusion_level` | 50 | 0.040 | [0.011, 0.135] | 0.500 | **collapse** |
+| `tool_identification` | 50 | 0.020 | [0.004, 0.105] | 1.000 | degenerate; **collapse** |
+| `lesion_screen_position` | 50 | 0.000 | [0.000, 0.071] | 0.250 | see below |
+| `lesion_site` | 50 | 0.000 | [0.000, 0.071] | 0.500 | **collapse** |
+| `lesion_size_range` | 50 | 0.000 | [0.000, 0.071] | 1.000 | degenerate; **collapse** |
+
+**Category-collapse flags** (§5.4 trigger: accuracy < 0.10 where chance > 0.30):
+`fluid_occlusion_level`, `lesion_site`, `lesion_size_range`, `tool_identification`.
+
+`lesion_screen_position` scores **0/50** but its chance of 0.25 falls under the 0.30 trigger,
+so the rule does not fire. It is named anyway: all four capacity-control models in §5 also
+scored 0 on it, which makes **five independent systems at zero on one question type**.
+
+**Answer-set mismatch explains the collapses. It does not explain the middle band.** The
+four flagged types have restricted answer sets the model is never shown. But on the yes/no
+and advancing/withdrawing types — where the answer space is obvious from the question and
+vocabulary is no barrier — the baseline sits at chance: `scope_backward_motion` 0.440,
+`scope_motion_type` 0.480, `scope_forward_motion` 0.500, `scope_outside` 0.520, against a
+0.500 floor. Vocabulary mismatch cannot account for that band. **This reading is post-hoc;
+it was not pre-registered and is offered as an observation about the table, not a tested
+claim.**
+
+### 10.5 Latency
+
+Median **3.387 s**, p90 **3.775 s**, batch size 1, A6000 (sm_86).
+
+**Not comparable to §7.** That bracket is `model.chat()` in its entirety, including
+preprocessing MiniCPM-o performs internally; §7's figures bracket a different interval on
+different hardware. The bracket boundary is recorded in the run manifest for exactly this
+reason. Two numbers measuring different intervals are not a comparison.
+
+### 10.6 Pre-registered outcome lookup
+
+Recorded as a matter of record and **explicitly non-capability**, per §11.3.
+
+```
+P₆₅₀ = 0.4308   ->  §6.1 band:  0.40 <= P₆₅₀ < 0.495
+P    = 0.4710   ->  §6.2 band:  0.40 <= P    < 0.571
+```
+
+| §7 abandonment criterion | verdict |
+|---|---|
+| 1. `P₆₅₀ >= 0.495`? | 0.4308 — **False** |
+| 2. `P >= 0.571`? | 0.4710 — **False** |
+| 3. severely weakened: `0.40 <= P₆₅₀ < 0.495` **and** baseline latency <= the fine-tune's | first conjunct **True (live)**; second **UNRESOLVED** |
+
+Criterion 3 stays open. Its second conjunct compares two latencies measured under different
+brackets (§11.5), and it is not claimed to fail merely because 3.387 s exceeds the
+fine-tune's figure. Resolving it requires re-measuring both under one bracket.
+
+**Distance above the transferred prior (0.420) on the 650**, kept out of the tables above
+because §2.2 of the pre-registration forbids the prior appearing in a baseline row: the
+baseline is **+1.1 points**, `M_ft` is **+7.5 points**. The baseline figure is not a
+capability measurement.
+
+### 10.7 Artifacts
+
+| | |
+|---|---|
+| predictions | `results/baseline/minicpmo45.jsonl` |
+| run manifest | `results/baseline/minicpmo45.manifest.json` |
+| rendered prompt (Gate 2, read by eye) | `results/baseline/minicpmo45_rendered_prompt.txt` |
+| Gate 3 probe, post-refactor | `artifacts/probe/` |
+| Gate 3 probe, pre-refactor | `artifacts/probe_pre_refactor/` |
+| full audit output | `analysis/omni_baseline/stage6_audit_output.txt` |
+| audit script | `src/analysis/stage6_baseline_audit.py` |
+| Phi-4 failure log | `results/baseline/phi4mm_probe_FAILED.log` |
+
+The two probe directories exist so the Stage 4.5 refactor is auditable: it moved the adapters
+into a module shared by the probe and the run, and the re-probe reproduced all three gates
+with **byte-identical outputs on all 10 audio pairs** and a byte-identical rendered prompt. A
+refactor that moves the number is not a refactor.
+
+---
+
+## 11. Future work
+
+Ordered by expected value, none of it run. The off-the-shelf omni-model comparison that
+appeared here in earlier versions has since been **run** — see [§10](#10-omni-baseline).
 
 1. **Targeted frame resampling** — re-extract frames aligned to where the labeled motion
    occurs, rather than at a fixed offset. This is the precondition for any temporal result;
@@ -416,11 +634,8 @@ Ordered by expected value, none of it run:
 3. **Variable-length audio encoding** — truncating or pooling the audio token budget to
    actual utterance duration would remove roughly 88% of the prefill cost measured in §7 and
    bring direct audio to approximate latency parity.
-4. **Off-the-shelf omni-model comparison** — Phi-4-multimodal and MiniCPM-o are screened and
-   pre-registered but not run. The question is whether a general-purpose omni model already
-   does this task without task-specific fine-tuning.
-5. **Acoustic robustness** — all evaluation audio is clean TTS across 41 voices
+4. **Acoustic robustness** — all evaluation audio is clean TTS across 41 voices
    with mild rate jitter. Adding background noise, reverberation, and varied SNR
    would test whether direct audio input degrades more gracefully than an ASR
    pipeline, which is the untested half of the error-propagation argument.
-6. **Denser frame sampling and higher resolution** — 16 or 32 frames, 512px or above.
+5. **Denser frame sampling and higher resolution** — 16 or 32 frames, 512px or above.

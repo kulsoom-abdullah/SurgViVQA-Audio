@@ -483,7 +483,7 @@ instead), and W&B run directories.
 ## 🔮 Future Work
 
 Ordered by expected value, with rationale and current evidence, in
-[`docs/RESULTS.md` §10](docs/RESULTS.md#10-future-work): targeted frame
+[`docs/RESULTS.md` §11](docs/RESULTS.md#11-future-work): targeted frame
 resampling, native video input, variable-length audio encoding, acoustic
 robustness, and denser frame sampling.
 
