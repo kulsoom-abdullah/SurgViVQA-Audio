@@ -5,9 +5,6 @@
   "deterministic": true,
   "sensitivity": 1.0,
   "image_sensitivity": true,
-  "adapters_sha256": "120920ef88ecf6ea627b224bbde0ee1a553c88ab7aa4d64c254408aed589f085",
-  "sync_source": "latency_bench.sync",
-  "timing_bracket": "model.chat() whole call; includes internal preprocessing",
   "passed": true,
   "rows": [
     {

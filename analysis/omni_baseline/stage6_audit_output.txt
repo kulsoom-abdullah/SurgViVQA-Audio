@@ -1,0 +1,492 @@
+rows: 1000
+
+=== (a) gold inside a longer word (lenient hit, strict must miss) ===
+  genuine splits (no carve-out rescue): 0
+  rescued by a carve-out (rules agree by design): 2
+    fluid_occlusion_level | gold='complete' | correct=1 strict=1
+      FULL PREDICTION: 'The fluid-based occlusion appears to be moderate, partially obstructing the view but not completely blocking it.'
+    fluid_occlusion_level | gold='complete' | correct=1 strict=1
+      FULL PREDICTION: 'Moderate to severe, as evidenced by the thick yellow fluid completely obscuring the mucosal surface.'
+
+=== (b) carve-out fired ({'complete': ['completely'], 'down': ['downward'], 'up': ['upward']}) ===
+  count: 2
+    fluid_occlusion_level      gold='complete'     via 'completely' pred='The fluid-based occlusion appears to be modera'  correct=1 strict=1
+    fluid_occlusion_level      gold='complete'     via 'completely' pred='Moderate to severe, as evidenced by the thick '  correct=1 strict=1
+  of those, lenient ALSO hit: 2/2
+
+=== (c) predicted_answer length, in words ===
+  median 7 | p90 11 | max 26 | min 1
+  rows with 1 word: 177  | <= 3 words: 241  | > 15 words: 16
+
+=== (d) scoring-path integrity ===
+  stored   correct != strict_match : 0
+  recomputed lenient != strict     : 0
+  stored correct differs from recomputed lenient : 0
+  stored strict_match differs from recomputed strict : 0
+
+  VERDICT: equality is real
+
+=== carve-out census: BASELINE MiniCPM-o 4.5 (1000 rows) ===
+  rows credited ONLY via a carve-out: 2
+    fluid_occlusion_level | gold='complete' | correct=1
+      'The fluid-based occlusion appears to be moderate, partially obstructing the view but not completely blocking it.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Moderate to severe, as evidenced by the thick yellow fluid completely obscuring the mucosal surface.'
+
+=== carve-out census: M_ft cell 3 (fine-tuned, audio-only) (1000 rows) ===
+  rows credited ONLY via a carve-out: 19
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+    fluid_occlusion_level | gold='complete' | correct=1
+      'Fluid occlusion completely obscures the view.'
+
+
+=== SAMPLE A: 30 random INCORRECT rows (seed 20260731; pool 529) ===
+classify: content failure | format failure (right content, lexically missed)
+
+A01  qa_002188  scope_forward_motion
+     Q    When motion occurs, is the scope pushing forward?
+     gold 'no'
+     pred 'Yes, the scope is pushing forward.'
+
+A02  qa_003460  lesion_screen_position
+     Q    In what screen quadrant does the lesion appear?
+     gold 'lower-right'
+     pred 'The lesion appears in the lower right quadrant.'
+
+A03  qa_001964  scope_motion
+     Q    Is the scope actively moving throughout this clip?
+     gold 'no'
+     pred 'Yes, the scope is actively moving throughout the clip.'
+
+A04  qa_003731  lesion_motion_direction
+     Q    In which direction does the lesion drift over the frames?
+     gold 'stable'
+     pred 'The lesion drifts to the right over the frames.'
+
+A05  qa_003356  lesion_site
+     Q    At which anatomical site is the lesion located?
+     gold 'rectum'
+     pred 'The lesion is located in the esophagus.'
+
+A06  qa_002847  scope_motion_type
+     Q    Is the scope primarily advancing or withdrawing in this sequence?
+     gold 'advancing'
+     pred 'Withdrawing'
+
+A07  qa_000104  mucosa_visibility
+     Q    Can you clearly observe clean mucosa in these frames?
+     gold 'yes'
+     pred 'No'
+
+A08  qa_001462  occlusion_check
+     Q    Does a close-up obstruction block the field of view?
+     gold 'no'
+     pred 'Yes, there is a close-up obstruction blocking the field of view.'
+
+A09  qa_002977  scope_motion_type
+     Q    Is the scope primarily advancing or withdrawing in this sequence?
+     gold 'advancing'
+     pred 'The scope is primarily withdrawing.'
+
+A10  qa_001663  fluid_occlusion_level
+     Q    How severe is the fluid-based occlusion?
+     gold 'absent'
+     pred 'Moderate.'
+
+A11  qa_003741  lesion_motion_direction
+     Q    In which direction does the lesion drift over the frames?
+     gold 'stable'
+     pred 'The lesion drifts to the right over the frames.'
+
+A12  qa_003226  lesion_size_range
+     Q    Into which millimeter bracket does the lesion size fall?
+     gold '<5'
+     pred 'The lesion size falls into the 5 to 10 millimeter bracket.'
+
+A13  qa_000074  mucosa_visibility
+     Q    Can you clearly observe clean mucosa in these frames?
+     gold 'yes'
+     pred 'No, the mucosa appears to be covered with fluid or mucus.'
+
+A14  qa_001409  occlusion_check
+     Q    Does a close-up obstruction block the field of view?
+     gold 'yes'
+     pred 'No, the field of view remains largely unobstructed.'
+
+A15  qa_002841  scope_motion_type
+     Q    Is the scope primarily advancing or withdrawing in this sequence?
+     gold 'advancing'
+     pred 'The scope is primarily withdrawing.'
+
+A16  qa_002396  scope_backward_motion
+     Q    When motion occurs, does the scope pull backward?
+     gold 'yes'
+     pred 'No, it moves forward.'
+
+A17  qa_003406  lesion_site
+     Q    At which anatomical site is the lesion located?
+     gold 'rectum'
+     pred 'The lesion is located in the colon.'
+
+A18  qa_003628  lesion_motion_direction
+     Q    In which direction does the lesion drift over the frames?
+     gold 'stable'
+     pred 'The lesion drifts to the left over the frames.'
+
+A19  qa_002578  scope_outside
+     Q    Is the scope positioned outside the patient here?
+     gold 'yes'
+     pred 'No, the scope is positioned inside the patient.'
+
+A20  qa_000583  tool_catheter_check
+     Q    Is the instrument on screen a catheter?
+     gold 'no'
+     pred 'Yes'
+
+A21  qa_002020  scope_forward_motion
+     Q    When motion occurs, is the scope pushing forward?
+     gold 'no'
+     pred 'Yes, the scope is pushing forward.'
+
+A22  qa_003469  lesion_screen_position
+     Q    In what screen quadrant does the lesion appear?
+     gold 'upper-right'
+     pred 'The lesion appears in the lower right quadrant of the screen.'
+
+A23  qa_001693  fluid_occlusion_level
+     Q    How severe is the fluid-based occlusion?
+     gold 'absent'
+     pred 'The fluid-based occlusion is severe.'
+
+A24  qa_000130  mucosa_visibility
+     Q    Can you clearly observe clean mucosa in these frames?
+     gold 'no'
+     pred 'Yes'
+
+A25  qa_003540  lesion_screen_position
+     Q    In what screen quadrant does the lesion appear?
+     gold 'upper-right'
+     pred 'The lesion appears in the superior quadrant.'
+
+A26  qa_003424  lesion_site
+     Q    At which anatomical site is the lesion located?
+     gold 'rectum'
+     pred 'The lesion is located in the colon.'
+
+A27  qa_003395  lesion_site
+     Q    At which anatomical site is the lesion located?
+     gold 'rectum'
+     pred 'The lesion is located in the stomach.'
+
+A28  qa_002377  scope_backward_motion
+     Q    When motion occurs, does the scope pull backward?
+     gold 'yes'
+     pred 'No, the scope moves forward.'
+
+A29  qa_003578  lesion_screen_position
+     Q    In what screen quadrant does the lesion appear?
+     gold 'upper-left'
+     pred 'The lesion appears in the upper left quadrant.'
+
+A30  qa_003414  lesion_site
+     Q    At which anatomical site is the lesion located?
+     gold 'rectum'
+     pred 'The lesion is located in the esophagus.'
+
+
+=== SAMPLE B: 30 random CORRECT rows (seed 20260731; pool 471) ===
+classify: true credit | false credit (wrong content, lexically matched)
+A false credit cannot appear among incorrect rows, so this direction needs
+its own sample. §5.2 as written specified only the first direction.
+
+B01  qa_002233  scope_backward_motion
+     gold 'no'
+     pred 'No, the scope moves forward.'
+
+B02  qa_002605  flush_action
+     gold 'yes'
+     pred 'Yes, the endoscopist is flushing the scene.'
+
+B03  qa_002516  scope_outside
+     gold 'no'
+     pred 'No, the scope is positioned inside the patient.'
+
+B04  qa_000901  nbi_status
+     gold 'no'
+     pred 'No, these frames are not captured using NBI mode.'
+
+B05  qa_001950  scope_motion
+     gold 'yes'
+     pred 'Yes, the scope is actively moving throughout this clip.'
+
+B06  qa_002844  scope_motion_type
+     gold 'withdrawing'
+     pred 'Withdrawing'
+
+B07  qa_002645  flush_action
+     gold 'yes'
+     pred 'Yes, the endoscopist is flushing the scene in these frames.'
+
+B08  qa_002483  scope_outside
+     gold 'no'
+     pred 'No, the scope is positioned inside the patient.'
+
+B09  qa_000672  endoscope_visibility
+     gold 'no'
+     pred 'No, the endoscope body is not visible.'
+
+B10  qa_001164  lighting_mode
+     gold 'NBI'
+     pred 'NBI'
+
+B11  qa_000859  nbi_status
+     gold 'yes'
+     pred 'Yes'
+
+B12  qa_001166  lighting_mode
+     gold 'NBI'
+     pred 'Narrow Band Imaging (NBI)'
+
+B13  qa_000164  mucosa_visibility
+     gold 'yes'
+     pred 'Yes, the mucosa appears clean.'
+
+B14  qa_001485  occlusion_check
+     gold 'yes'
+     pred 'Yes, a close-up obstruction blocks the field of view.'
+
+B15  qa_001305  blue_dye_presence
+     gold 'no'
+     pred 'No, contrast dye is not visible on the mucosal surface.'
+
+B16  qa_000652  endoscope_visibility
+     gold 'no'
+     pred 'No, the endoscope body is not visible.'
+
+B17  qa_000745  endoscope_visibility
+     gold 'no'
+     pred 'No, the endoscope body is not visible.'
+
+B18  qa_001817  scope_motion
+     gold 'yes'
+     pred 'Yes, the scope is actively moving throughout this clip.'
+
+B19  qa_002814  scope_motion_type
+     gold 'withdrawing'
+     pred 'Withdrawing'
+
+B20  qa_000641  endoscope_visibility
+     gold 'no'
+     pred 'No, the endoscope body is not visible.'
+
+B21  qa_000671  endoscope_visibility
+     gold 'no'
+     pred 'no'
+
+B22  qa_002643  flush_action
+     gold 'yes'
+     pred 'Yes, the endoscopist appears to be flushing the scene in these frames.'
+
+B23  qa_001938  scope_motion
+     gold 'no'
+     pred 'No, the scope appears to be stationary or moving very minimally throughout the clip.'
+
+B24  qa_002749  flush_action
+     gold 'no'
+     pred 'No, the endoscopist is not flushing the scene in these frames.'
+
+B25  qa_003052  lesion_histology_extended
+     gold 'hyperplastic'
+     pred 'Hyperplastic polyp'
+
+B26  qa_002223  scope_backward_motion
+     gold 'no'
+     pred 'No, the scope moves forward.'
+
+B27  qa_002804  scope_motion_type
+     gold 'withdrawing'
+     pred 'Withdrawing'
+
+B28  qa_001200  lighting_mode
+     gold 'NBI'
+     pred 'NBI'
+
+B29  qa_000910  nbi_status
+     gold 'yes'
+     pred 'Yes, these frames are captured using NBI mode.'
+
+B30  qa_001436  occlusion_check
+     gold 'yes'
+     pred 'Yes, a close-up obstruction blocks the field of view.'
+
+
+=== CENSUS C: ALL 16 predictions over 15 words ===
+Every one, not a sample — a census of a small well-defined subset cannot be
+accused of favourable sampling, and this tail is where format failures concentrate.
+
+C01  qa_001700  fluid_occlusion_level  (26 words, scored correct=0)
+     gold 'complete'
+     pred 'Based on the video, the fluid-based occlusion appears to be moderate to severe, as there is a significant amount of fluid present in the digestive tract.'
+
+C02  qa_001792  fluid_occlusion_level  (24 words, scored correct=0)
+     gold 'absent'
+     pred 'The fluid-based occlusion appears to be mild to moderate, as only a small amount of fluid is visible at the bottom of the lumen.'
+
+C03  qa_001178  lighting_mode  (23 words, scored correct=1)
+     gold 'NBI'
+     pred "The sequence is illuminated by Narrow Band Imaging (NBI), as indicated by the 'NBI' label in the top right corner of the frame."
+
+C04  qa_001609  fluid_occlusion_level  (22 words, scored correct=0)
+     gold 'absent'
+     pred 'The fluid-based occlusion appears to be mild to moderate, as only a thin layer of fluid is visible on the mucosal surface.'
+
+C05  qa_001191  lighting_mode  (22 words, scored correct=1)
+     gold 'NBI'
+     pred "The lighting modality is Narrow Band Imaging (NBI), as indicated by the 'NBI' label in the top right corner of the image."
+
+C06  qa_002910  scope_motion_type  (22 words, scored correct=1)
+     gold 'withdrawing'
+     pred 'The scope is primarily withdrawing, as evidenced by the decreasing size of the visible lumen and the changing perspective of the folds.'
+
+C07  qa_001612  fluid_occlusion_level  (22 words, scored correct=0)
+     gold 'complete'
+     pred 'The fluid-based occlusion appears to be moderate, as there are visible bubbles and wetness but the underlying tissue is still partially visible.'
+
+C08  qa_001127  lighting_mode  (20 words, scored correct=1)
+     gold 'NBI'
+     pred "The sequence is illuminated by Narrow Band Imaging (NBI), as indicated by the 'NBI' label in the top right corner."
+
+C09  qa_001108  lighting_mode  (20 words, scored correct=1)
+     gold 'NBI'
+     pred "The letters 'NBI' in the top right corner indicate that Narrow Band Imaging is being used to illuminate this sequence."
+
+C10  qa_001071  lighting_mode  (20 words, scored correct=1)
+     gold 'NBI'
+     pred "The sequence is illuminated by Narrow Band Imaging (NBI), as indicated by the 'NBI' label in the top right corner."
+
+C11  qa_001147  lighting_mode  (20 words, scored correct=1)
+     gold 'NBI'
+     pred "The sequence is illuminated by Narrow Band Imaging (NBI), as indicated by the 'NBI' label in the top right corner."
+
+C12  qa_001069  lighting_mode  (20 words, scored correct=1)
+     gold 'NBI'
+     pred "The sequence is illuminated by Narrow Band Imaging (NBI), as indicated by the 'NBI' label in the top right corner."
+
+C13  qa_001034  lighting_mode  (20 words, scored correct=1)
+     gold 'NBI'
+     pred "The sequence is illuminated by Narrow Band Imaging (NBI), as indicated by the 'NBI' label in the top right corner."
+
+C14  qa_001711  fluid_occlusion_level  (17 words, scored correct=0)
+     gold 'absent'
+     pred 'The fluid-based occlusion appears to be moderate, partially obstructing the view but not completely blocking the passage.'
+
+C15  qa_001932  scope_motion  (17 words, scored correct=1)
+     gold 'no'
+     pred 'No, the scope appears to be stationary or moving very minimally throughout the duration of the clip.'
+
+C16  qa_001748  fluid_occlusion_level  (16 words, scored correct=1)
+     gold 'complete'
+     pred 'The fluid-based occlusion appears to be moderate, partially obstructing the view but not completely blocking it.'
+
+
+§5.4 stratification — BASELINE MiniCPM-o 4.5, strict scoring, frozen rule
+Per-type transferred prior is deliberately ABSENT: §2.2 forbids it in a
+baseline row — the prior is unavailable to a zero-shot arm.
+
+question_type                  n     acc       Wilson 95% CI  chance  note
+--------------------------------------------------------------------------
+blue_dye_presence             50   0.660   [0.522, 0.776]   1.000  suggestive only; degenerate
+endoscope_visibility          50   0.960   [0.865, 0.989]   1.000  suggestive only; degenerate
+fluid_occlusion_level         50   0.040   [0.011, 0.135]   0.500  suggestive only; *** CATEGORY COLLAPSE ***
+flush_action                  50   0.700   [0.562, 0.809]   0.500  suggestive only
+lesion_histology_extended     50   0.980   [0.895, 0.996]   1.000  suggestive only; degenerate
+lesion_motion_direction       50   0.160   [0.083, 0.285]   0.200  suggestive only
+lesion_screen_position        50   0.000   [0.000, 0.071]   0.250  suggestive only
+lesion_site                   50   0.000   [0.000, 0.071]   0.500  suggestive only; *** CATEGORY COLLAPSE ***
+lesion_size_range             50   0.000   [0.000, 0.071]   1.000  suggestive only; degenerate; *** CATEGORY COLLAPSE ***
+lighting_mode                 50   0.980   [0.895, 0.996]   1.000  suggestive only; degenerate
+mucosa_visibility             50   0.580   [0.442, 0.706]   0.500  suggestive only
+nbi_status                    50   1.000   [0.929, 1.000]   0.500  suggestive only
+occlusion_check               50   0.620   [0.482, 0.741]   0.500  suggestive only
+scope_backward_motion         50   0.440   [0.312, 0.577]   0.500  suggestive only
+scope_forward_motion          50   0.500   [0.366, 0.634]   0.500  suggestive only
+scope_motion                  50   0.560   [0.423, 0.688]   0.500  suggestive only
+scope_motion_type             50   0.480   [0.348, 0.615]   0.500  suggestive only
+scope_outside                 50   0.520   [0.385, 0.652]   0.500  suggestive only
+tool_catheter_check           50   0.220   [0.128, 0.352]   1.000  suggestive only; degenerate
+tool_identification           50   0.020   [0.004, 0.105]   1.000  suggestive only; degenerate; *** CATEGORY COLLAPSE ***
+
+No per-type comparison is called significant: with 20 types the
+multiple-comparison problem makes single-type significance meaningless.
+The honest use of this table is detecting category collapse, not finding winners.
+
+=== category-collapse flags (acc < 0.10 where chance > 0.30) ===
+  fluid_occlusion_level: acc=0.040 vs chance=0.500 (n=50)
+  lesion_site: acc=0.000 vs chance=0.500 (n=50)
+  lesion_size_range: acc=0.000 vs chance=1.000 (n=50)
+  tool_identification: acc=0.020 vs chance=1.000 (n=50)
+
+*** GOVERNING OUTCOME: §5.2 THRESHOLD BREACHED (33.3% format failures > 20%) ***
+The strict number is NOT reportable as a capability measurement. The §5.2 remedy
+is unavailable: it routes the capability claim to lenient, but lenient and strict
+agree on all 1000 rows, so there is no second metric to fall back to. No
+comparison to M_ft's 0.571 / 0.495 is licensed on this evidence.
+Everything below is A MATTER OF RECORD, explicitly NON-CAPABILITY.
+
+=== §6 band lookup (non-capability, for the record) ===
+  P_650 = 0.4308   -> §6.1 band: 0.40 <= P_650 < 0.495
+  P     = 0.4710   -> §6.2 band: 0.40 <= P     < 0.571
+
+=== §7 abandonment criteria ===
+  1. P_650 >= 0.495 ?   0.4308 >= 0.495 -> False
+  2. P     >= 0.571 ?   0.4710 >= 0.571 -> False
+  3. severely weakened if 0.40 <= P_650 < 0.495 AND baseline median latency
+     <= the fine-tune's.
+     first conjunct : 0.40 <= 0.4308 < 0.495 -> True  (LIVE)
+     second conjunct: baseline median 3.387s brackets model.chat() WHOLE
+       call including internal preprocessing; the fine-tune's ~0.93s figure was
+       measured under a different bracket and possibly different hardware.
+       UNRESOLVED pending reconciliation. Not claimed to fail merely because
+       3.387 > 0.93 — the two numbers do not measure the same interval.
+     criterion 3 verdict: UNRESOLVED
+
+=== labelled comparison: distance above the transferred prior (0.4200) ===
+  §2.2 forbids the prior in a baseline results row, so it lives here, separately.
+    baseline disc-650  0.4308  ->  +1.08 points
+    M_ft     disc-650  0.4950  ->  +7.50 points
+  The baseline figure is NOT a capability measurement (see governing outcome).

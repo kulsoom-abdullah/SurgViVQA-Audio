@@ -1,0 +1,5 @@
+<|im_start|>user
+Answer the question concisely based on the visual and audio evidence.<|im_end|>
+<|im_start|>assistant
+
+[APPROX: string content supplied] Answer the question concisely based on the visual and audio evidence.
