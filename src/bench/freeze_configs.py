@@ -2,7 +2,7 @@
 """
 Stage 2 — freeze configs and run the pre-rental sanity assertions.
 
-Writes configs/parity.yaml and configs/vocab_v1.txt, then asserts every value the
+Writes configs/parity.yaml, then asserts every value the
 screening depends on. Aborts on any mismatch; nothing gets rented until this exits 0.
 
 The Parity-B instruction is extracted BY BYTES from src/evaluate_checkpoint.py and
@@ -22,12 +22,6 @@ from pathlib import Path
 PARITY_B_SHA256 = "19cdcc49804887546caa625547573347cd09b3303bf7143f365e1f58a991f410"
 PARITY_B_LEN = 69
 
-EXPECTED_VOCAB = [
-    "<5", "NBI", "absent", "adenoma", "advancing", "ascending", "catheter", "complete",
-    "descending", "down", "forceps", "hyperplastic", "left", "lower-left", "lower-right",
-    "no", "rectum", "right", "sigma", "snare", "stable", "up", "upper-left",
-    "upper-right", "withdrawing", "yes",
-]
 EXPECTED_DEGENERATE = [
     "blue_dye_presence", "endoscope_visibility", "lesion_histology_extended",
     "lesion_size_range", "lighting_mode", "tool_catheter_check", "tool_identification",
@@ -86,20 +80,10 @@ Path("configs/parity.yaml").write_text(
 )
 print("  wrote configs/parity.yaml")
 
-# ---- 2b: vocab V1 from TRAIN only ------------------------------------------------------
-print("\n=== 2b. configs/vocab_v1.txt (TRAIN only) ===")
+# ---- 2d: sanity assertions -------------------------------------------------------------
 train = [json.loads(l) for l in open("data/train_multivideo.jsonl")]
 test = [json.loads(l) for l in open("data/test_multivideo.jsonl")]
-vocab = sorted({r["short_answer"] for r in train})
-check("entry count", len(vocab), 26)
-check("matches expected list exactly", vocab == EXPECTED_VOCAB, True)
-test_answers = {r["short_answer"] for r in test}
-check("test answers", len(test_answers), 21)
-check("test answers unreachable under V1", len(test_answers - set(vocab)), 0)
-Path("configs/vocab_v1.txt").write_text("\n".join(vocab) + "\n")
-print("  wrote configs/vocab_v1.txt")
 
-# ---- 2d: sanity assertions -------------------------------------------------------------
 print("\n=== 2d. test set shape ===")
 check("row count", len(test), 1000)
 check("distinct question_type", len({r["question_type"] for r in test}), 20)

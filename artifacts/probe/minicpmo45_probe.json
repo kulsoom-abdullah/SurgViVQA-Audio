@@ -1,0 +1,91 @@
+{
+  "model": "minicpmo45",
+  "revision": "44151b3",
+  "omni_mode": false,
+  "deterministic": true,
+  "sensitivity": 1.0,
+  "image_sensitivity": true,
+  "passed": true,
+  "rows": [
+    {
+      "pair": 0,
+      "type_a": "occlusion_check",
+      "type_b": "scope_backward_motion",
+      "out_a": "Yes, a close-up obstruction blocks the field of view.",
+      "out_b": "Yes, the scope pulls backward when motion occurs.",
+      "differs": true
+    },
+    {
+      "pair": 1,
+      "type_a": "scope_motion_type",
+      "type_b": "scope_motion",
+      "out_a": "Advancing",
+      "out_b": "Yes, the scope is actively moving throughout the clip.",
+      "differs": true
+    },
+    {
+      "pair": 2,
+      "type_a": "scope_motion",
+      "type_b": "nbi_status",
+      "out_a": "Yes, the scope is actively moving throughout this clip.",
+      "out_b": "No, these frames are not captured using NBI mode.",
+      "differs": true
+    },
+    {
+      "pair": 3,
+      "type_a": "scope_motion_type",
+      "type_b": "lesion_histology_extended",
+      "out_a": "Advancing",
+      "out_b": "Hyperplastic polyp",
+      "differs": true
+    },
+    {
+      "pair": 4,
+      "type_a": "flush_action",
+      "type_b": "lesion_size_range",
+      "out_a": "No, the endoscopist is not flashing the scene in these frames.",
+      "out_b": "The lesion size falls into the 10 to 19 millimeter bracket.",
+      "differs": true
+    },
+    {
+      "pair": 5,
+      "type_a": "tool_identification",
+      "type_b": "lesion_histology_extended",
+      "out_a": "Endoscope",
+      "out_b": "Hyperplastic polyp",
+      "differs": true
+    },
+    {
+      "pair": 6,
+      "type_a": "fluid_occlusion_level",
+      "type_b": "mucosa_visibility",
+      "out_a": "Moderate.",
+      "out_b": "Yes, clean mucosa can be observed in these frames.",
+      "differs": true
+    },
+    {
+      "pair": 7,
+      "type_a": "flush_action",
+      "type_b": "nbi_status",
+      "out_a": "Yes, the endoscopist is flushing the scene in these frames.",
+      "out_b": "No, these frames are not captured using NBI mode.",
+      "differs": true
+    },
+    {
+      "pair": 8,
+      "type_a": "tool_identification",
+      "type_b": "lesion_screen_position",
+      "out_a": "Endoscope",
+      "out_b": "Upper right",
+      "differs": true
+    },
+    {
+      "pair": 9,
+      "type_a": "scope_forward_motion",
+      "type_b": "scope_motion_type",
+      "out_a": "Yes, the scope is pushing forward when mucus occurs.",
+      "out_b": "The scope is primarily withdrawing.",
+      "differs": true
+    }
+  ]
+}
