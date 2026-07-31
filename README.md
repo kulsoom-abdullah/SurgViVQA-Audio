@@ -8,69 +8,15 @@
 
 ---
 
-## 🛠️ The Engineering Journey
-
-*From Proof-of-Concept to Generalization*
-
-### 1. Feasibility (Multimodal Adaptation Test)
-* **Challenge:** My [previous work](https://github.com/kulsoom-abdullah/Qwen2-VL-Audio-Adapter) adapted audio as an input option to Qwen2. This project tests adding audio to a vision-language model so it can handle audio + vision → text.
-* **Method:** Trained on a small set (10 samples) until Loss converged quickly to 0.
-* **Result:** Confirmed the end-to-end gradient flow (Audio + Vision → Text) was functional before scaling the training.
-
-### 2. Stratified Splitting
-* **Challenge:** Medical data is often imbalanced. While this set, SurgViVQA, was not severely skewed globally (61% Yes/No), critical categories like `tool_identification` represent only **3.7%** of the data. Random splitting risked leaving these out of the validation set.
-* **Solution:** Implemented **Question-Type Stratification** ([`scripts/create_multivideo_split.py`](scripts/create_multivideo_split.py)) to ensure every category (e.g., Tools, Motion, Lesion) was represented in the 15% Eval split.
-
-### 3. Generalization (Held-Out Video)
-* **Challenge:** Prevent the model from overfitting to procedure-specific visual patterns.
-* **Method:** Evaluated on a completely unseen video (`002-004`) to test generalization to an unseen video.
-
-### 4. Deployment (Streamlit Demo)
-* **Output:** Built an interactive app ([`src/app.py`](src/app.py)) with "Flipbook" animation to visualize the sampled frame sequence for clinicians.
-* **Features:** Question type filtering, 8-frame grid view, animated playback (2 FPS), audio recording with live inference.
-
----
-
-## 📊 Data Distribution
-
-I used a portion of the [**SurgViVQA**](https://github.com/madratak/SurgViVQA/) dataset [1], generating audio from the text questions using [edge-tts](https://github.com/rany2/edge-tts) to simulate a spoken-query environment.
-
-### Dataset Splits
-
-| Split | Samples | Video IDs (Procedures) | Purpose |
-|-------|---------|------------------------|---------|
-| **Train** | 2,302 | 002-001, 002-002, 002-003 | Model Training |
-| **Eval** | 398 | 002-001, 002-002, 002-003 | In-Training Validation |
-| **Test** | 1,000 | 002-004 (held-out) | Generalization Testing |
-| **Total** | **3,700** | 4 colonoscopy procedures | 20 question types |
-
-**Terminology:** Each **sample** = 1 question + 8 consecutive frames + 1 answer. **Video IDs** refer to different colonoscopy procedures.
-
-### High-Level Statistics
-
-- **Question Types:** 20 distinct categories across 4 reasoning domains
-- **Answer Format Distribution:**
-  - **Yes/No questions:** 13 types (65% of question types)
-    - Examples: occlusion_check, scope_motion, tool_catheter_check
-  - **Limited-Choice questions:** 7 types (35% of question types)
-    - 2-5 options per question
-    - Examples: lesion_motion_direction (5 directions), lesion_site (4 locations), scope_motion_type (2 types)
-- **Answer Distribution (training set):**
-  - Yes: 25.7% | No: 35.4% | Limited-choice: 38.8%
-- **Held-Out Test Set Characteristics:**
-  - Mixed balance: Motion and occlusion questions are balanced (50/50), while tool/dye presence questions in this specific video slice are single-class (100% 'No'), reflecting the specific procedure's nature.
-  - Limited-choice questions evenly distributed (e.g., lesion_motion_direction: 20% per direction)
-  - Some categories have zero variety (lesion_size_range: 100% <5mm, tool_identification: 100% forceps)
-
-📄 **See detailed breakdown:** [docs/data_distribution.md](docs/data_distribution.md)
-
----
 <a id="results"></a>
 ## 📈 Results
 
 The model answers questions about surgical video from **spoken audio only** — no question
 text reaches the model at any point. Fine-tuning raised audio-only accuracy from **10.7% to
 57.1%** on 1,000 held-out samples from a patient absent from training.
+
+> The 10.7% figure is the same Qwen2-VL + Whisper stack before the audio adapter was
+> trained (`results/baseline/cell2_base_audio.jsonl`).
 
 That headline number is close to meaningless on its own, and the rest of this section is
 about why.
@@ -83,22 +29,44 @@ Seven of 20 question types have a single gold answer across all 50 of their test
 those **350 rows — 35% of the test set — a constant string scores 100%** and no model can
 be distinguished from a lookup table.
 
-A system that identifies which of the 20 questions was asked and emits that type's most
-common answer, using no video at all, scores:
+**A control with no perception at all.** Consider something that is not a model: it hears
+nothing, sees nothing, and knows only *which of the 20 question types was asked*. For each
+type it emits a single canned answer — the most common answer for that type in the
+training data. It can be right for no reason other than how the answers are distributed.
 
-| baseline | full 1,000 | discriminative 650 |
+| no-perception control | full 1,000 | discriminative 650 |
 |---|---|---|
-| majority answer per question type | **64.8%** | **45.8%** |
+| **most common training answer per type** (a deployable system could do this) | **57.3%** | **42.0%** |
+| most common *test* answer per type (needs the test labels — upper bound only) | 64.8% | 45.8% |
 
-**64.8% exceeds every system measured here, including this one at 57.1%.** Aggregate
-accuracy on this benchmark measures answer priors more than it measures vision. All
-comparisons below therefore use the **650 rows from the 13 question types with more than
-one answer class**, and report margin over the per-type floor.
+**57.3% edges out every system measured here, including this one at 57.1% — using no
+video and no audio.** That does not mean this model sees nothing. It means aggregate
+accuracy on this benchmark cannot tell the difference, because the answer distribution
+alone gets you there.
+
+All comparisons below therefore use the **650 rows from the 13 question types that have
+more than one answer in the test set**. The test-answer version above is shown only as a
+ceiling; no deployable system has access to test-set answer distributions, so scoring
+against it holds every model to a bar built from answers it never saw.
+
+**Two different references, and they answer different questions.** A *majority baseline*
+answers "does aggregate accuracy on this benchmark measure priors rather than perception?"
+*Per-type chance* (`1/|A_t|`, one over the number of answers a question type actually has)
+answers "can any model do this question type at all?" The two coincide except where the
+training majority collapses — see the family table below.
 
 ### Capability is a function of question family, not of model
 
 Five systems on identical rows, frames, prompt, and grading rule. Stock models receive the
-question as text; this model receives it as audio. Margin over the constant-emitter floor:
+question as text; this model receives it as audio.
+
+Margins here are reported against **per-type chance**, which coincides with the test-answer
+floor for families A, C and D. Family B is the one divergence — its four classes are not
+exactly even, so its test floor is 26.0 against a chance of 25.0, and the table uses 26.0.
+The training-answer floor is used for the aggregate argument above, because that argument
+is about what a deployable prior-only system achieves; it is **not** used per-type, because
+on two question types the training majority answer never occurs in the held-out video and
+the floor collapses to zero for reasons unrelated to difficulty.
 
 | question family | n | floor | **this model** (audio) | Qwen2-VL-7B | Qwen2.5-VL-7B | Qwen3-VL-8B | Qwen3-VL-32B |
 |---|---|---|---|---|---|---|---|
@@ -106,6 +74,15 @@ question as text; this model receives it as audio. Margin over the constant-emit
 | **B. Screen-space position** | 50 | 26.0 | +0.0 | +8.0 | −4.0 | −4.0 | **+22.0** |
 | **C. Temporal / motion** | 250 | 44.0 | +0.4 | +2.4 | +2.4 | +4.8 | +4.8 |
 | **D. Anatomical / diagnostic** | 200 | 87.5 | −57.0 | −79.0 | −87.5 | −60.0 | −58.5 |
+
+**Why family D's floor is 87.5 and not the training-answer 50.0.** 87.5 *is* per-type
+chance for this family: three of its four types are degenerate — one test answer, so chance
+is 100% — and `lesion_site` is binary, so `(0.5×50 + 50 + 50 + 50) / 200 = 87.5`. The
+train-derived 50.0 is an artifact: on `lesion_site` and `tool_identification` the training
+majority answer never appears in this patient's test answers at all, so a control trained on
+the training set scores **0/50** on both and the family floor collapses for reasons that
+have nothing to do with how hard the questions are. The train-derived reading (floor 50.0,
+this model −19.5) is recorded in [`docs/RESULTS.md`](docs/RESULTS.md) for audit.
 
 Three findings, each supported by five independent systems spanning 7B→33B and two model
 generations:
@@ -171,35 +148,34 @@ seconds of speech and has not been measured.
   most of this model's aggregate lead comes from having learned the correct constant for the
   single-class types, not from visual discrimination
 
----
+### Zero-shot comparison: MiniCPM-o 4.5
 
-## 📏 Evaluation Methodology
+An off-the-shelf omni model built the same way as this project — a Whisper encoder
+projected into an LLM (SigLIP2 + Whisper-medium + Qwen3-8B, 9B total) — evaluated
+zero-shot on the same 1,000 rows: same audio clips, same 8 frames, same instruction
+string, same grading rule.
 
-### Metric: Keyword-Based Exact Match Accuracy
+**47.1% full / 43.1% discriminative-650 — reported as a non-capability measurement.**
 
-Since our questions are classification tasks (binary Yes/No or multi-class with 2-5 options), we evaluate using **answer keyword matching** rather than text generation metrics like BLEU or ROUGE.
+A pre-specified audit found **33% of its failures were answer-set mismatch rather than
+wrong answers**. `fluid_occlusion_level` admits only `absent` or `complete`;
+`lesion_site` only `sigma` or `rectum`. The model answers "moderate" and "colon" —
+defensible readings of the scene, in vocabulary this corpus does not contain and never
+shows it. The pre-registered rule voids the capability claim at a 20% threshold, so no
+comparison to this system's 49.5% is licensed.
 
-**Implementation:**
-```python
-is_correct = sample['short_answer'].lower() in predicted.lower()
-```
+Per-type results split cleanly. Where the answer space is obvious from the question
+(yes/no, advancing/withdrawing) the baseline sits at chance — 0.44 to 0.52 against a 0.50
+floor. Where the answer space is restricted and unguessable, it collapses to zero: four
+question types flagged. Answer-set mismatch explains the collapses; it does not explain
+the middle band.
 
-**Why this approach?**
-- ✅ **Verifies factual correctness** regardless of phrasing
-- ✅ **Allows natural language responses** from the LLM
-- ✅ **Standard for factoid QA** (similar to SQuAD, TriviaQA evaluation)
-
-**Example:**
-
-| Ground Truth | Model Response | Evaluated As |
-|--------------|----------------|--------------|
-| "left" | "left" | ✅ Correct |
-| "left" | "The lesion is moving to the left" | ✅ Correct (contains keyword) |
-| "left" | "right" | ❌ Wrong |
-| "Yes" | "Yes, there is occlusion present" | ✅ Correct |
-| "NBI" | "The lighting mode is NBI" | ✅ Correct |
-
-This is **not** text generation quality evaluation—we only care that the model gets the right factual answer, not how eloquently it phrases it.
+Criteria, outcome bands, and abandonment conditions were fixed in
+[PRE_REGISTRATION.md](PRE_REGISTRATION.md), committed and tagged
+`prereg-omni-baseline` before any baseline model was downloaded. Phi-4-multimodal was
+screened and attempted but never probed — it ran out of memory at the first generation,
+requesting 29.5 GiB for a single attention matrix on a 48 GB card with 8 frames plus audio
+at eager attention. Recorded as a capacity result, not a capability one.
 
 ---
 
@@ -255,6 +231,87 @@ I tracked training stability using Weights & Biases to ensure proper convergence
 
 ---
 
+## 📊 Data Distribution
+
+I used a portion of the [**SurgViVQA**](https://github.com/madratak/SurgViVQA/) dataset [1], generating audio from the text questions using [edge-tts](https://github.com/rany2/edge-tts) to simulate a spoken-query environment.
+
+### Dataset Splits
+
+| Split | Samples | Video IDs (Procedures) | Purpose |
+|-------|---------|------------------------|---------|
+| **Train** | 2,302 | 002-001, 002-002, 002-003 | Model Training |
+| **Eval** | 398 | 002-001, 002-002, 002-003 | In-Training Validation |
+| **Test** | 1,000 | 002-004 (held-out) | Generalization Testing |
+| **Total** | **3,700** | 4 colonoscopy procedures | 20 question types |
+
+**Terminology:** Each **sample** = 1 question + 8 consecutive frames + 1 answer. **Video IDs** refer to different colonoscopy procedures.
+
+### High-Level Statistics
+
+- **Question Types:** 20 distinct categories across 4 reasoning domains
+- **Answer Format Distribution:**
+  - **Yes/No questions:** 13 types (65% of question types)
+    - Examples: occlusion_check, scope_motion, tool_catheter_check
+  - **Limited-Choice questions:** 7 types (35% of question types)
+    - 2-5 options per question
+    - Examples: lesion_motion_direction (5 directions), lesion_site (4 locations), scope_motion_type (2 types)
+- **Answer Distribution (training set):**
+  - Yes: 25.7% | No: 35.4% | Limited-choice: 38.8%
+- **Held-Out Test Set Characteristics:**
+  - Mixed balance: Motion and occlusion questions are balanced (50/50), while tool/dye presence questions in this specific video slice are single-class (100% 'No'), reflecting the specific procedure's nature.
+  - Limited-choice questions evenly distributed (e.g., lesion_motion_direction: 20% per direction)
+  - Some categories have zero variety (lesion_size_range: 100% <5mm, tool_identification: 100% forceps)
+
+📄 **See detailed breakdown:** [docs/data_distribution.md](docs/data_distribution.md)
+
+## 📏 Evaluation Methodology
+
+### Metric: Keyword-Based Exact Match Accuracy
+
+Since our questions are classification tasks (binary Yes/No or multi-class with 2-5 options), we evaluate using **answer keyword matching** rather than text generation metrics like BLEU or ROUGE.
+
+**Implementation:**
+```python
+is_correct = sample['short_answer'].lower() in predicted.lower()
+```
+
+Results are also scored under a stricter word-boundary rule with three carve-outs
+(`complete`/`completely`, `down`/`downward`, `up`/`upward`). **The two rules agree on
+all 1,000 rows for both the fine-tuned model and the zero-shot baseline** — zero
+disagreements — so substring matching is not inflating any number reported here.
+
+**Why this approach?**
+- ✅ **Verifies factual correctness** regardless of phrasing
+- ✅ **Allows natural language responses** from the LLM
+- ✅ **Standard for factoid QA** (similar to SQuAD, TriviaQA evaluation)
+
+**Example:**
+
+| Ground Truth | Model Response | Evaluated As |
+|--------------|----------------|--------------|
+| "left" | "left" | ✅ Correct |
+| "left" | "The lesion is moving to the left" | ✅ Correct (contains keyword) |
+| "left" | "right" | ❌ Wrong |
+| "Yes" | "Yes, there is occlusion present" | ✅ Correct |
+| "NBI" | "The lighting mode is NBI" | ✅ Correct |
+
+This is **not** text generation quality evaluation—we only care that the model gets the right factual answer, not how eloquently it phrases it.
+
+---
+
+## 🛠️ Engineering Journey
+
+- **Stratified splitting** — `tool_identification` is only 3.7% of the data, so random
+  splitting risked dropping whole categories from validation. Splits are stratified by
+  question type ([`scripts/create_multivideo_split.py`](scripts/create_multivideo_split.py)).
+- **Held-out video** — evaluation runs on video `002-004`, a patient absent from training,
+  so the reported numbers cannot come from memorized procedure-specific patterns.
+- **Deployment** — an interactive Streamlit app ([`src/app.py`](src/app.py)) with flipbook
+  frame playback, question-type filtering, and live audio recording.
+
+Earlier steps (a 10-sample overfit run to confirm gradient flow through the audio path)
+are development detail, not results.
+
 ## 🤗 Model Weights (Hugging Face)
 
 Weights + model card: https://huggingface.co/kulsoom-abdullah/surgvivqa-qwen7b-audio
@@ -262,7 +319,6 @@ Weights + model card: https://huggingface.co/kulsoom-abdullah/surgvivqa-qwen7b-a
 This repo uses the HF weights via the existing training/eval scripts. If you're just evaluating:
 - download/point to the checkpoint
 - run `src/evaluate_checkpoint.py` as shown below
-
 
 ### 1. Setup Environment
 
@@ -300,44 +356,7 @@ streamlit run src/app.py --server.port 8501 --server.address 0.0.0.0
 
 ### 🔍 Data Viewer
 
-Lightweight local browser for inspecting dataset samples and overlaying SFT/zero-shot model predictions. No GPU or extra dependencies required.
-
-**Generate the viewer:**
-```bash
-# Browse-only (no predictions)
-python scripts/generate_viewer_html.py --frames_dir dataset/frames
-
-# With predictions overlay (e.g. qwen3 zero-shot)
-python scripts/generate_viewer_html.py \
-    --frames_dir dataset/frames \
-    --predictions results/qwen3_zeroshot_test.jsonl \
-    --out viewer/data_viewer_qwen3.html
-```
-
-**Launch:**
-```bash
-python -m http.server 8080
-# open http://localhost:8080/viewer/data_viewer.html
-```
-
-**Usage:**
-- Set frame directory to wherever REAL-Colon frames are extracted (`dataset/frames/`)
-- Optionally load a predictions JSONL to overlay model outputs
-- Toggle between `in_template` / `out_template` question phrasing
-- Filter by question type to examine specific failure modes
-- Filter by correct / wrong (when predictions loaded)
-- Keyboard: `←` / `→` to navigate samples
-
-**Download frames from Figshare:**
-```bash
-# Step 1: see what's available and get per-video download commands
-python scripts/download_sample_frames.py
-
-# Step 2: after extracting, verify coverage
-python scripts/download_sample_frames.py --verify --output_dir dataset/frames
-```
-
-**Purpose:** Confirm whether 8-frame sequences contain sufficient visual signal for each question type — foundation for documenting SFT failure modes before GRPO.
+A lightweight local browser for inspecting dataset samples and overlaying model predictions — no GPU, no extra dependencies. Setup and usage: [`docs/data_viewer.md`](docs/data_viewer.md).
 
 > **⚠️ Under revision (July 2026):** the viewer can display a sample alongside another sample's question and answer. Treat its output as unverified.
 
@@ -378,45 +397,86 @@ python3 src/evaluate_checkpoint.py \
 
 ## 📂 Project Structure
 
+Generated from `git ls-files` — everything below is tracked in the repo. Bulk directories
+are summarised with a file count rather than enumerated.
+
 ```text
 SurgViVQA-Audio/
+├── PRE_REGISTRATION.md              # Omni-baseline study, tagged before any measurement
+├── omni_baseline_screening.md       # Screening plan and cost model for that study
+├── requirements.txt
+├── voices.txt                       # 41 edge-tts voices, split speaker-disjoint
 ├── src/
-│   ├── train_vqa.py                # Main training loop (QLoRA + audio adaptation)
-│   ├── app.py                      # Streamlit Demo (Interactive inference)
-│   └── evaluate_checkpoint.py      # Standalone evaluation script
-├── docs/
-│   ├── train_loss.png             # W&B plot
-│   ├── eval_loss.png              # W&B plot
-│   ├── data_distribution.md       # detailed stats
-│   └── data_stats.json            # for Streamlit app
-├── checkpoints/                    # Saved LoRA adapters
-│   └── surgical_vqa_multivideo/    # Best checkpoint (epoch 3.48)
+│   ├── train_vqa.py                 # Main training loop (QLoRA + audio adaptation)
+│   ├── app.py                       # Streamlit demo (interactive inference)
+│   ├── evaluate_checkpoint.py       # Standalone evaluation script — the shared harness
+│   ├── evaluate_zeroshot.py         # Vision+text zero-shot (no audio path)
+│   ├── evaluate_qwen3.py            # Cross-generation comparison runs
+│   ├── analyze_errors.py            # Per-type failure inspection
+│   ├── audio/
+│   │   ├── generate_audio.py        # K2-keyed TTS generation
+│   │   ├── voice_split.py           # Speaker-disjoint voice roster (seed 20260725)
+│   │   └── verify_audio_coverage.py
+│   ├── frames/
+│   │   └── verify_frame_coverage.py
+│   ├── bench/
+│   │   ├── omni_adapters.py         # Shared adapters + leak gate — probe and run use ONE path
+│   │   ├── omni_baseline.py         # Stage 5 run harness (off-the-shelf omni arm)
+│   │   ├── verify_combined_path.py  # Gate 3 probe: determinism, audio, image pathways
+│   │   ├── freeze_configs.py        # Stage 2 assertions; source of the strict scoring rule
+│   │   ├── capacity_control.py      # Four stock VLMs on identical rows
+│   │   └── latency_bench.py         # Direct audio vs ASR pipeline, matched hardware
+│   └── analysis/
+│       ├── question_identification.py
+│       └── stage6_baseline_audit.py # Format-failure audit, stratification, §6 lookup
+├── configs/
+│   └── parity.yaml                  # Frozen Parity-B instruction + sha256 pin
 ├── data/
-│   ├── frames/                      # Extracted frames (generated locally; not included in repo)
-│   ├── audio/                       # Generated TTS audio (generated locally; not included in repo)
 │   ├── train_multivideo.jsonl       # Multi-video train split
 │   ├── eval_multivideo.jsonl        # Multi-video eval split
 │   ├── test_multivideo.jsonl        # Held-out test split (video 002-004)
-│   ├── train_002001_stratified.jsonl# Stratified split (subset)
-│   ├── eval_002001_stratified.jsonl # Stratified split (subset)
+│   ├── probe_pairs.json             # Gate 3b cross-type audio pairs
 │   ├── in_template.jsonl            # Prompt template (input)
-│   └── out_template.jsonl           # Prompt template (output)
+│   ├── out_template.jsonl           # Prompt template (output)
+│   └── audio/_canonical/            # 820 canonical TTS clips (per-row files are hardlinks)
+├── results/
+│   ├── baseline/                    # Cell 1/2 base arms + the MiniCPM-o zero-shot run
+│   ├── cell3/                       # Fine-tuned audio-only predictions (57.1%) + train.log
+│   ├── capacity/                    # Four stock VLMs + vocabulary re-grade
+│   ├── bench/                       # Latency benchmark
+│   └── *.jsonl                      # Cross-generation comparison runs cited in Results
+├── artifacts/
+│   ├── probe/                       # Gate 3 probe output, post-refactor
+│   └── probe_pre_refactor/          # Same gates pre-refactor, kept for the diff
+├── analysis/
+│   ├── omni_baseline/               # Stage 6 audit output
+│   └── audio_ablation/              # Earlier ablation runbook and claims audit
+├── docs/
+│   ├── RESULTS.md                   # Full 20-type tables, both grading rules, audits
+│   ├── data_viewer.md               # Data viewer setup and usage
+│   ├── data_distribution.md         # Detailed stats
+│   ├── data_stats.json              # For the Streamlit app
+│   ├── train_loss.png               # W&B plot
+│   ├── eval_loss.png                # W&B plot
+│   └── run_evidence/                # W&B run config, metadata, system metrics
 ├── baselines/
 │   ├── baseline1_text_image.py      # Text-only questions + image (standard VQA setup)
 │   ├── baseline2_audio_image.py     # Audio → Whisper encoder embeddings (no decoding) → Qwen2-VL
-│   └── baseline3_asr_pipeline.py    # Two-stage pipeline: audio → Whisper ASR text → Qwen2-VL
-├── scripts/
-│   ├── train_multivideo_overnight.sh    # Full training script
-│   ├── generate_audio_multivideo.sh     # TTS generation for 3 videos
-│   ├── generate_audio_subset.py         # TTS audio generation for dataset samples
-│   ├── generate_all_audio.py            # Batch audio generation utility
-│   ├── create_multivideo_split.py       # Stratified data splitting
-│   └── analyze_data_distribution.py     # Generate data stats (run anytime)
-├── docs/
-│   ├── baseline_results.txt             # Experimental results documentation
-│   └── ...
-└── README.md
+│   └── baseline3_asr_pipeline.py    # Two-stage: audio → Whisper ASR text → Qwen2-VL
+├── scripts/                         # 32 files: splitting, TTS, viewer generation, pod setup
+│   ├── create_multivideo_split.py   # Stratified data splitting
+│   ├── generate_viewer_html.py      # Builds the local data viewer
+│   ├── download_sample_frames.py    # Figshare frame retrieval + coverage verify
+│   └── train_multivideo_overnight.sh
+├── viewer/                          # Generated HTML viewers (see docs/data_viewer.md)
+├── test_set/                        # Small fixtures for CI/validation
+└── transformers_fork/               # Vendored fork (4,797 files) for the audio-adapter path
 ```
+
+**Not in the repo** (generated locally or hosted elsewhere): `data/frames/` and the
+per-row `data/audio/{train,eval,test}/` clips, `checkpoints/` (LoRA adapters — published
+to [Hugging Face](https://huggingface.co/kulsoom-abdullah/surgvivqa-qwen7b-audio)
+instead), and W&B run directories.
 
 ---
 
@@ -424,8 +484,11 @@ SurgViVQA-Audio/
 
 Ordered by expected value, with rationale and current evidence, in
 [`docs/RESULTS.md` §10](docs/RESULTS.md#10-future-work): targeted frame
-resampling, native video input, variable-length audio encoding, off-the-shelf
-omni-model comparison, acoustic robustness, and denser frame sampling.
+resampling, native video input, variable-length audio encoding, acoustic
+robustness, and denser frame sampling.
+
+The off-the-shelf omni-model comparison is **done** — see
+[Zero-shot comparison: MiniCPM-o 4.5](#zero-shot-comparison-minicpm-o-45) above.
 
 ---
 
@@ -493,4 +556,3 @@ You are free to use, modify, and distribute this software, provided that proper 
 ---
 
 *Built with: PyTorch, [Transformers (custom fork)](https://github.com/kulsoom-abdullah/Qwen2-VL-Audio-Adapter/tree/main/transformers_fork), PEFT, Streamlit, Librosa, Edge-TTS*
-

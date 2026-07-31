@@ -1,0 +1,102 @@
+[
+  {
+    "audio_a": "data/audio/test/002-004_qa_001487_occlusion_check.mp3",
+    "audio_b": "data/audio/test/002-004_qa_002235_scope_backward_motion.mp3",
+    "type_a": "occlusion_check",
+    "type_b": "scope_backward_motion",
+    "id_a": "qa_001487",
+    "id_b": "qa_002235",
+    "text_a": "Does a close-up obstruction block the field of view?",
+    "text_b": "When motion occurs, does the scope pull backward?"
+  },
+  {
+    "audio_a": "data/audio/test/002-004_qa_002916_scope_motion_type.mp3",
+    "audio_b": "data/audio/test/002-004_qa_001892_scope_motion.mp3",
+    "type_a": "scope_motion_type",
+    "type_b": "scope_motion",
+    "id_a": "qa_002916",
+    "id_b": "qa_001892",
+    "text_a": "Is the scope primarily advancing or withdrawing in this sequence?",
+    "text_b": "Is the scope actively moving throughout this clip?"
+  },
+  {
+    "audio_a": "data/audio/test/002-004_qa_001888_scope_motion.mp3",
+    "audio_b": "data/audio/test/002-004_qa_000910_nbi_status.mp3",
+    "type_a": "scope_motion",
+    "type_b": "nbi_status",
+    "id_a": "qa_001888",
+    "id_b": "qa_000910",
+    "text_a": "Is the scope actively moving throughout this clip?",
+    "text_b": "Are these frames captured using NBI mode?"
+  },
+  {
+    "audio_a": "data/audio/test/002-004_qa_002930_scope_motion_type.mp3",
+    "audio_b": "data/audio/test/002-004_qa_003119_lesion_histology_extended.mp3",
+    "type_a": "scope_motion_type",
+    "type_b": "lesion_histology_extended",
+    "id_a": "qa_002930",
+    "id_b": "qa_003119",
+    "text_a": "Is the scope primarily advancing or withdrawing in this sequence?",
+    "text_b": "Which histologic category matches the lesion?"
+  },
+  {
+    "audio_a": "data/audio/test/002-004_qa_002618_flush_action.mp3",
+    "audio_b": "data/audio/test/002-004_qa_003156_lesion_size_range.mp3",
+    "type_a": "flush_action",
+    "type_b": "lesion_size_range",
+    "id_a": "qa_002618",
+    "id_b": "qa_003156",
+    "text_a": "Is the endoscopist flushing the scene in these frames?",
+    "text_b": "Into which millimeter bracket does the lesion size fall?"
+  },
+  {
+    "audio_a": "data/audio/test/002-004_qa_000215_tool_identification.mp3",
+    "audio_b": "data/audio/test/002-004_qa_003056_lesion_histology_extended.mp3",
+    "type_a": "tool_identification",
+    "type_b": "lesion_histology_extended",
+    "id_a": "qa_000215",
+    "id_b": "qa_003056",
+    "text_a": "Which instrument is present in this clip?",
+    "text_b": "Which histologic category matches the lesion?"
+  },
+  {
+    "audio_a": "data/audio/test/002-004_qa_001663_fluid_occlusion_level.mp3",
+    "audio_b": "data/audio/test/002-004_qa_000029_mucosa_visibility.mp3",
+    "type_a": "fluid_occlusion_level",
+    "type_b": "mucosa_visibility",
+    "id_a": "qa_001663",
+    "id_b": "qa_000029",
+    "text_a": "How severe is the fluid-based occlusion?",
+    "text_b": "Can you clearly observe clean mucosa in these frames?"
+  },
+  {
+    "audio_a": "data/audio/test/002-004_qa_002780_flush_action.mp3",
+    "audio_b": "data/audio/test/002-004_qa_000899_nbi_status.mp3",
+    "type_a": "flush_action",
+    "type_b": "nbi_status",
+    "id_a": "qa_002780",
+    "id_b": "qa_000899",
+    "text_a": "Is the endoscopist flushing the scene in these frames?",
+    "text_b": "Are these frames captured using NBI mode?"
+  },
+  {
+    "audio_a": "data/audio/test/002-004_qa_000294_tool_identification.mp3",
+    "audio_b": "data/audio/test/002-004_qa_003490_lesion_screen_position.mp3",
+    "type_a": "tool_identification",
+    "type_b": "lesion_screen_position",
+    "id_a": "qa_000294",
+    "id_b": "qa_003490",
+    "text_a": "Which instrument is present in this clip?",
+    "text_b": "In what screen quadrant does the lesion appear?"
+  },
+  {
+    "audio_a": "data/audio/test/002-004_qa_002130_scope_forward_motion.mp3",
+    "audio_b": "data/audio/test/002-004_qa_002946_scope_motion_type.mp3",
+    "type_a": "scope_forward_motion",
+    "type_b": "scope_motion_type",
+    "id_a": "qa_002130",
+    "id_b": "qa_002946",
+    "text_a": "When motion occurs, is the scope pushing forward?",
+    "text_b": "Is the scope primarily advancing or withdrawing in this sequence?"
+  }
+]

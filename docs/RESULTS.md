@@ -158,8 +158,11 @@ All loaded 4-bit NF4 with bf16 compute, greedy, `max_new_tokens=128`.
 
 ### 5.1 Per question type
 
-Vocabulary-normalized (see [§6](#6-vocabulary-normalization-audit)). Floor is the
-constant-emitter rate for that type.
+Vocabulary-normalized (see [§6](#6-vocabulary-normalization-audit)). Floor here is the
+**test-majority** constant-emitter rate for that type, which for every type in this table
+also equals per-type chance `1/|A_t|` except `lesion_screen_position` (26 vs 25, because
+its four classes are not exactly even). §5.3 below uses the **train-majority** floor, which
+differs on `lesion_site` and `tool_identification` only — see the note under that table.
 
 | question type | classes | floor | this model | Qwen2-VL-7B | Qwen2.5-VL-7B | Qwen3-VL-8B | Qwen3-VL-32B |
 |---|---|---|---|---|---|---|---|
@@ -207,6 +210,20 @@ Margin over floor. Family assignment is a judgment call and is documented in
 | C. Temporal / motion | 250 | 44.0 | +0.4 | +2.4 | +2.4 | +4.8 | +4.8 |
 | D. Anatomical / diagnostic | 200 | 87.5 | −57.0 | −79.0 | −87.5 | −60.0 | −58.5 |
 
+Floors are **per-type chance**, which equals the test-majority floor for families A, C and
+D. Family B is the sole divergence — its four classes are not exactly even, giving a test
+floor of 26.0 against chance 25.0; the table uses 26.0.
+
+Family D's floor is 87.5 because that *is* per-type chance here: three of its four types
+are degenerate (one test answer, chance 100%) and `lesion_site` is binary, so
+`(0.5×50 + 50 + 50 + 50) / 200 = 87.5`.
+
+**Train-majority reading, recorded for audit.** Under the transferred prior the D row is
+floor 50.0 → −19.5 / −41.5 / −50.0 / −22.5 / −21.0. It is not used, because on `lesion_site`
+and `tool_identification` the training majority answer never occurs in this patient's test
+answers, so the constant emitter scores 0/50 on both and the floor collapses for reasons
+unrelated to difficulty. Families A, B and C are identical under either definition.
+
 - **A** — `nbi_status`, `mucosa_visibility`, `occlusion_check`, `fluid_occlusion_level`,
   `scope_outside`, `flush_action`
 - **B** — `lesion_screen_position`
@@ -245,7 +262,9 @@ the same frames. This corrects an earlier claim in this repository that attribut
 `lesion_screen_position` failure to input resolution.
 
 **`lesion_site` is likely unanswerable from these inputs.** All five systems score 0–22%
-against a 50% floor. Distinguishing sigmoid colon from rectum is done by insertion depth
+against 50% chance — `lesion_site` is binary in the held-out video (`sigma` / `rectum`).
+Below chance on a binary type is what supports the claim; "floor" is ambiguous in this
+document and does not carry it. Distinguishing sigmoid colon from rectum is done by insertion depth
 and navigational landmarks, not from a close-up view of mucosa. This is a
 benchmark-construction issue rather than a model failure.
 

@@ -1,0 +1,17 @@
+{
+  "model": "minicpmo45",
+  "question_type": "fluid_occlusion_level",
+  "question": "How severe is the fluid-based occlusion?",
+  "audio": "data/audio/test/002-004_qa_001738_fluid_occlusion_level.mp3",
+  "frame_overlap": 0,
+  "row_a": "qa_001738",
+  "gold_a": "absent",
+  "out_a": "Moderate.",
+  "gold_match_a": false,
+  "row_b": "qa_001786",
+  "gold_b": "complete",
+  "out_b": "The fluid-based occlusion is very severe.",
+  "gold_match_b": false,
+  "differs": true,
+  "passed": true
+}

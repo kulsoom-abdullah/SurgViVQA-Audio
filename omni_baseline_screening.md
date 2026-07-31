@@ -319,10 +319,9 @@ Gemma 4, Qwen2.5-Omni and Nemotron 3 Nano Omni stay scoped, unprobed and unrun.
 | Env verification, two venvs | 0.5 | $0.35 |
 | Downloads (12.9 GB + 20 GB) | 0.8 | $0.56 |
 | Probe both (2 × 21 generations) | 0.5 | $0.35 |
-| Full run, selected model, V0 | 3.0 | $2.10 |
-| Full run, selected model, V1 | 3.0 | $2.10 |
+| Full run, selected model | 3.0 | $2.10 |
 | Debug slack | 2.5 | $1.75 |
-| **Total** | **10.3** | **≈ $7** |
+| **Total** | **7.3** | **≈ $5** |
 
 Pair building is CPU-only and happens before renting.
 

@@ -91,6 +91,10 @@ results/baseline/*
 !results/baseline/*.json
 !results/baseline/*.jsonl
 !results/baseline/*.patch
+# Same reasoning as !results/cell3/*.log below: phi4mm_probe_FAILED.log is the only
+# record of the Phi-4 OOM that PRE_REGISTRATION.md §10 cites, and minicpmo45_run.log is
+# the only progress trace of the 1000-row run.
+!results/baseline/*.log
 
 # Cross-model capacity control and latency benchmark: predictions + manifests
 # are the evidence the results docs cite, so they are tracked.

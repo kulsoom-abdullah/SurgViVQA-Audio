@@ -1,0 +1,4 @@
+parity_b_instruction: "Answer the question concisely based on the visual and audio evidence."
+parity_b_sha256: "19cdcc49804887546caa625547573347cd09b3303bf7143f365e1f58a991f410"
+parity_b_length: 69
+source: "src/evaluate_checkpoint.py:309"
