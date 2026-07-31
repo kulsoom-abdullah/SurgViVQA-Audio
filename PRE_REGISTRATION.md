@@ -54,7 +54,7 @@ delta**. The claim that strict and lenient coincide for this arm is confirmed, n
 
 | Quantity | Value | Why it is not a comparator |
 |---|---|---|
-| Qwen2-Audio-7B-Transcription, audio-only | 0.107 | A model **fine-tuned specifically to transcribe**, not a general-purpose model performing badly. Measuring a general-purpose omni model against a transcription-specialised one is not like-for-like and would flatter the baseline for reasons unrelated to architecture. **Provenance to record before publication** — which harness and which instruction string produced it. `src/evaluate_zeroshot.py` is ruled out (vision+text only, no audio path), but the instruction regime behind 0.107 is not yet established, and the row must be labelled with it or dropped. |
+| Base Qwen2-VL + Whisper stack, no trained audio adapter, audio-only | 0.107 | This is this project's own architecture before the audio adapter was trained, not a general-purpose model performing badly. It measures an untrained projector, so comparing it to a general-purpose omni model is not like-for-like and would flatter the baseline for reasons unrelated to architecture. Provenance: `results/baseline/cell2_base_audio.jsonl.manifest.json`. |
 | Transferred-prior floor `F` | 0.573 / **0.420** | Derived from **my training labels**. A zero-shot model has never seen them and cannot be held to a bar built from them. Bar for `M_ft` only. |
 | Per-type chance `1/\|A_t\|` | 0.648 / **0.458** | Reference line for zero-shot arms — but see §2.2a: unusable on full-1000. |
 
@@ -119,7 +119,7 @@ Consequences, binding:
 | **A1** | **MiniCPM-o 4.5** (9B, rev `44151b3`) | zero-shot | **Preferred run** — see §3.2 |
 | **A1′** | **Phi-4-multimodal-instruct** (5.58B, rev `93f923e`) | zero-shot | Fallback run / safer probe |
 | **A2** | Qwen2-VL + Whisper-large-v3-turbo, QLoRA FT | fine-tuned | **Comparison target** (`M_ft`) |
-| C1 | Qwen2-Audio-7B-Transcription | as measured | Context only (§2.2) |
+| C1 | Base Qwen2-VL + Whisper stack, no trained audio adapter | as measured | Context only (§2.2) |
 | C2 | Transferred-prior floor | n/a | Context only, **A2 section exclusively** |
 
 **Decision rule, fixed before probing:**
@@ -402,8 +402,8 @@ No meaningful accuracy margin and no speed margin leaves no argument worth makin
 
 **NOT abandoned merely because:**
 
-- The baseline beats the 0.107 context row. That number is a transcription-specialised
-  model and is not a comparator (§2.2).
+- The baseline beats the 0.107 context row. That number is this project's own stack with
+  an untrained audio projector and is not a comparator (§2.2).
 - The baseline clears the 0.573 transferred prior. Not a bar it is held to (§2.2).
 - The baseline beats A2 on a single question type. §5.4 — no single-type claims, either
   direction.
@@ -460,6 +460,7 @@ what this document attests to.
 
 | Date | Stage | Deviation | Reason | Effect on interpretation |
 |---|---|---|---|---|
+| 2026-07-31 | 2.2, **POST-data** | The 0.107 context row was mislabelled as **Qwen2-Audio-7B-Transcription**. It is in fact the base Qwen2-VL + Whisper stack with no trained audio adapter — cell 2 of the same cell2/cell3 lineage that produced 0.571. Corrected from the run manifest (`results/baseline/cell2_base_audio.jsonl.manifest.json`, `"accuracy": 10.7`), corroborated by `docs/RESULTS.md` ("base, no adapter | audio | 10.7%"). The unresolved-provenance note is deleted; §3.1's C1 row and §7's abandonment clause are relabelled to match. | **No effect on any measurement.** Only the model identity changes; the row's status as a non-comparator is unchanged and it appears in no results table. The rationale for excluding it survives the correction with different reasoning — it measures an untrained projector rather than a transcription-specialised model, and either way is not like-for-like against a general-purpose omni model. |
 | 2026-07-31 | 5.2, **POST-data** | The format-failure audit was extended to classify a second direction it did not originally have: **false credits** (wrong content, lexically matched), alongside the format failures (right content, lexically missed) §5.2 specifies. Added after seeing the results. Two baseline rows were adjudicated as false credits — both `fluid_occlusion_level`, gold `complete`, credited because `completely` appears inside the prediction, once inside a negation ("not completely blocking it"). | §5.2 as written audits only under-crediting. Auditing one direction and not the other measures whether the metric is unfair to the model, never whether it is unfair to the comparison. The same check run symmetrically on `M_ft` found 19 carve-out credits, **all legitimate** — so the frozen rule advantages the fine-tune roughly 10× more than the baseline, and leaving it untouched is the conservative choice. | **The adjudicated figure is reported as a sensitivity check, never as the headline.** Headline stays 47.10% / 43.08% under the frozen Stage-2 rule — the rule `M_ft`'s 0.571 was scored under, so revising it would break comparability. Sensitivity figure: 46.90% / 42.77%. The adjustment moves the number in the direction that **favours the fine-tune**, which is precisely why it is not permitted to be the headline. |
 | 2026-07-31 | 3.1, **pre-data** | **Phi-4-multimodal: screened, probe attempted, not completed.** Two load failures on dependencies omitted from §11.1 (`torchvision`, `backoff`), both corrected; the third attempt loaded and died with `torch.OutOfMemoryError` at the first generation — 29.5 GiB requested for a single attention matrix in the model's own remote-code attention (`modeling_phi4mm.py:1150`) on top of 44 GB resident, on a 48 GB card. Zero gates reached, no artifacts written. | Both routes around it were closed by the study's own rules: switching to flash-attn is a forbidden code-path change, and reducing the frame count breaks parity with the arm under comparison. | Recorded as an environment/capacity result, **not** a capability result — nothing about Phi-4's audio or vision pathway was measured. §3.1 therefore resolved to row 2 (only MiniCPM-o cleared) rather than row 1. |
 | 2026-07-30 | 3.4, **pre-data** | The vocabulary-hint condition (V1) was removed before any baseline row was produced. The study now runs a single condition: the Parity-B instruction alone. `configs/vocab_v1.txt`, `build_v1_instruction()` and the V1 hash pin were deleted; output is `results/baseline/{model}.jsonl` with no condition suffix. | A supplied answer vocabulary has no counterpart in the regime `M_ft` was measured under, so V1 was not a like-for-like comparison — it would have produced a second number that could not be set beside the fine-tune without an asterisk. The single condition is the parity-clean one. | None on the read. No baseline data existed. The §6 lookup is now filled from the only condition, which was already the designated primary. `assert_no_leak`'s `instruction` argument stays required — correct regardless of how many conditions exist, and it prevents a future condition from being added without confronting the excision assumption. |
