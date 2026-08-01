@@ -38,7 +38,7 @@ Two honest scope notes to keep with the claim:
 
 ## (e) The "+17" zero-shot baseline — what was its input
 
-"+17–19 percentage points via domain-specific training" ([baseline_results.txt:28](../../docs/baseline_results.txt);
+"+17–19 percentage points via domain-specific training" ([baseline_results.txt:28](../../docs/notes/baseline_results.txt);
 [README.md:76](../../README.md) "+17.4 points") = fine-tuned **63.4%** − zero-shot **46%**.
 
 - Zero-shot **audio** baseline (46%): question via **audio only**, fixed generic instruction,
@@ -63,7 +63,7 @@ adding ≈0 — honest, still a contribution, just not an audio result.
 | # | Claim (as worded) | Verdict | Basis |
 | :-: | :-- | :-- | :-- |
 | 1 | **Résumé:** multi-GPU DDP QLoRA fine-tune on 2× RTX 4090 | ✅ **SUPPORTED** | W&B run `4owcddle`: `gpu_count=2`, two 4090 UUIDs, 89% mean util both, 348.7 min → [docs/run_evidence/](../../docs/run_evidence/). Independent: `checkpoint-1000/` has `rng_state_0` **and** `_1`. |
-| 2 | **"Model answers questions asked out loud"** — [README.md:2](../../README.md) "hear… audio (no ASR)", [:83](../../README.md) "matching text-based approaches **while using raw audio**", [baseline_results.txt:30](../../docs/baseline_results.txt) "correctly interprets audio questions" | ⏳ **PENDING ablation** | Confound: training + eval + demo fed the question as text **and** audio ([train_vqa.py:168](../../src/train_vqa.py), [evaluate_checkpoint.py:131](../../src/evaluate_checkpoint.py), [app.py:137](../../src/app.py)). **Pre-registered rule:** `text_only ≥ 61.4%` ⇒ audio decorative ⇒ claim **not defensible as worded**; `mismatched_audio` drop ⇒ audio **is** read. |
+| 2 | **"Model answers questions asked out loud"** — [README.md:2](../../README.md) "hear… audio (no ASR)", [:83](../../README.md) "matching text-based approaches **while using raw audio**", [baseline_results.txt:30](../../docs/notes/baseline_results.txt) "correctly interprets audio questions" | ⏳ **PENDING ablation** | Confound: training + eval + demo fed the question as text **and** audio ([train_vqa.py:168](../../src/train_vqa.py), [evaluate_checkpoint.py:131](../../src/evaluate_checkpoint.py), [app.py:137](../../src/app.py)). **Pre-registered rule:** `text_only ≥ 61.4%` ⇒ audio decorative ⇒ claim **not defensible as worded**; `mismatched_audio` drop ⇒ audio **is** read. |
 | 3 | **2.5× faster** by skipping ASR ([README.md:86](../../README.md)) | ✅ **SUPPORTED** (scoped) | Row (d). Fair Baseline 2 vs 3 architectural comparison; note zero-shot audio-only latency and the separate accuracy trade-off. |
 
 **Not yet auditable from the repo:** the verbatim résumé bullet and deck one-liners — I audited

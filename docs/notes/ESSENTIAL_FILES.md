@@ -134,4 +134,4 @@ scp -P $RUNPOD_PORT -r \
 **Keep on Mac:**
 - `docs/` (Documentation)
 - Full dataset files in `data/`
-- This file (`docs/ESSENTIAL_FILES.md`)
+- This file (`docs/notes/ESSENTIAL_FILES.md`)

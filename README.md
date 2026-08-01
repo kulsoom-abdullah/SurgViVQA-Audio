@@ -458,7 +458,8 @@ SurgViVQA-Audio/
 │   ├── data_stats.json              # For the Streamlit app
 │   ├── train_loss.png               # W&B plot
 │   ├── eval_loss.png                # W&B plot
-│   └── run_evidence/                # W&B run config, metadata, system metrics
+│   ├── run_evidence/                # W&B run config, metadata, system metrics
+│   └── notes/                       # Working notes kept for provenance, not curated
 ├── baselines/
 │   ├── baseline1_text_image.py      # Text-only questions + image (standard VQA setup)
 │   ├── baseline2_audio_image.py     # Audio → Whisper encoder embeddings (no decoding) → Qwen2-VL
