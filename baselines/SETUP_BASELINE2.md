@@ -7,13 +7,13 @@ Baseline 2 uses your custom audio-grafted Qwen2-VL which requires modified trans
 On your **Mac**, run:
 
 ```bash
-cd /Users/kulsoom/workspace/learning/SurgViVQA-Audio/baselines
+cd /path/to/SurgViVQA-Audio/baselines
 
 # Create the directory on Lambda Labs
 ssh ubuntu@132-145-135-107 "mkdir -p ~/audiograft/SurgViVQA-Audio/baselines/transformers_local/transformers/models"
 
 # Copy the modified qwen2_vl module
-scp -r /Users/kulsoom/workspace/learning/Qwen2-VL-Audio-Graft/transformers_fork/src/transformers/models/qwen2_vl \
+scp -r /path/to/Qwen2-VL-Audio-Graft/transformers_fork/src/transformers/models/qwen2_vl \
     ubuntu@132-145-135-107:~/audiograft/SurgViVQA-Audio/baselines/transformers_local/transformers/models/
 
 # Copy the updated baseline2 script

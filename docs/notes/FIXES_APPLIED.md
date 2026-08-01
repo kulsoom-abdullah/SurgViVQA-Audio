@@ -191,7 +191,7 @@ Your current checkpoint works fine with SDPA. The quantization doesn't cause pro
 
 1. ✅ **Upload updated files:**
    ```bash
-   cd /Users/kulsoom/workspace/learning/SurgViVQA-Audio
+   cd /path/to/SurgViVQA-Audio
    scp train_vqa.py evaluate_checkpoint.py verify_tokenizer.sh train_with_eval_FINAL.sh \
        ubuntu@YOUR_LAMBDA_IP:~/audiograft/SurgViVQA-Audio/
    ```

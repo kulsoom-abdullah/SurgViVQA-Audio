@@ -10,7 +10,7 @@
 
 ```bash
 # On your Mac
-cd /Users/kulsoom/workspace/learning/SurgViVQA-Audio
+cd /path/to/SurgViVQA-Audio
 
 scp train_vqa.py ubuntu@132-145-138-210:~/audiograft/SurgViVQA-Audio/
 ```

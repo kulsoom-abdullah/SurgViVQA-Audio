@@ -1,6 +1,6 @@
 {
   "slide": "Slide 7 - Frame Sampling Failure: lesion_motion_direction",
-  "output_png": "/Users/kulsoom/workspace/learning/SurgViVQA-Audio/docs/slide7_frame_sampling.png",
+  "output_png": "docs/slide7_frame_sampling.png",
   "model_context": {
     "hero_model": "Qwen2-VL-7B + LoRA audio graft (kulsoom-abdullah/Qwen2-Audio-7B-Transcription + checkpoint-1000)",
     "hero_overall_accuracy": "63.4%",

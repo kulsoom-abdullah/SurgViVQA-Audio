@@ -14,7 +14,7 @@ First, you need to provide the paths to your checkpoints:
 Run the merge script:
 
 ```bash
-cd /Users/kulsoom/workspace/learning/SurgViVQA-Audio
+cd /path/to/SurgViVQA-Audio
 
 python merge_stage2_to_bf16.py \
     --stage1_model_path /path/to/your/stage1/checkpoint \
@@ -23,13 +23,13 @@ python merge_stage2_to_bf16.py \
 ```
 
 **Example if your checkpoints are:**
-- Stage-1: `/Users/kulsoom/workspace/learning/Qwen2-VL-Audio-Graft/checkpoints/stage1_audio_graft`
-- Stage-2: `/Users/kulsoom/workspace/learning/Qwen2-VL-Audio-Graft/checkpoints/stage2_lora_audio`
+- Stage-1: `/path/to/Qwen2-VL-Audio-Graft/checkpoints/stage1_audio_graft`
+- Stage-2: `/path/to/Qwen2-VL-Audio-Graft/checkpoints/stage2_lora_audio`
 
 ```bash
 python merge_stage2_to_bf16.py \
-    --stage1_model_path /Users/kulsoom/workspace/learning/Qwen2-VL-Audio-Graft/checkpoints/stage1_audio_graft \
-    --stage2_adapter_path /Users/kulsoom/workspace/learning/Qwen2-VL-Audio-Graft/checkpoints/stage2_lora_audio \
+    --stage1_model_path /path/to/Qwen2-VL-Audio-Graft/checkpoints/stage1_audio_graft \
+    --stage2_adapter_path /path/to/Qwen2-VL-Audio-Graft/checkpoints/stage2_lora_audio \
     --output_path ./qwen2_audio_vl_merged_bf16
 ```
 

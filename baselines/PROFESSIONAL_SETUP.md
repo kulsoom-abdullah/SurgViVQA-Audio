@@ -13,7 +13,7 @@ This document shows how to properly package your custom transformers fork for re
 
 ```bash
 # On your Mac
-cd /Users/kulsoom/workspace/learning/Qwen2-VL-Audio-Graft
+cd /path/to/Qwen2-VL-Audio-Graft
 
 # Initialize the transformers fork as a separate repo
 cd transformers_fork

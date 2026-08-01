@@ -112,7 +112,7 @@ results/                        # ~5MB
 
 ```bash
 # From your Mac
-cd /Users/kulsoom/workspace/learning/SurgViVQA-Audio
+cd /path/to/SurgViVQA-Audio
 
 export RUNPOD_PORT=12345
 export RUNPOD_HOST=123.45.67.89
